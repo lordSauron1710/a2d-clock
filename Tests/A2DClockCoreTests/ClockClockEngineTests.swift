@@ -23,6 +23,15 @@ final class ClockClockEngineTests: XCTestCase {
         XCTAssertEqual(engine.digits(for: date, calendar: calendar), [1, 3, 0, 5])
     }
 
+    func testEngineUsesTwelveHourDigits() {
+        let afternoonDate = makeDate(hour: 13, minute: 5, second: 30)
+        let midnightDate = makeDate(hour: 0, minute: 5, second: 30)
+        let engine = ClockClockEngine(hourFormat: .twelve)
+
+        XCTAssertEqual(engine.digits(for: afternoonDate, calendar: calendar), [0, 1, 0, 5])
+        XCTAssertEqual(engine.digits(for: midnightDate, calendar: calendar), [1, 2, 0, 5])
+    }
+
     func testFrameContainsTwentyFourClockFaces() {
         let date = makeDate(hour: 9, minute: 41, second: 22)
         let engine = ClockClockEngine()
@@ -34,11 +43,49 @@ final class ClockClockEngineTests: XCTestCase {
 
     func testMinuteBoundaryStartsFromPreviousMinutePose() {
         let date = makeDate(hour: 10, minute: 11, second: 0)
-        let engine = ClockClockEngine(transitionDuration: 2.4, flourishSplit: 0.34)
+        let engine = ClockClockEngine()
         let frame = engine.frame(for: date, calendar: calendar)
 
         XCTAssertEqual(frame.digits, [1, 0, 1, 1])
         XCTAssertEqual(frame.poses, DigitGlyph.poses(for: [1, 0, 1, 0]))
+    }
+
+    func testTransitionMovesAwayFromPreviousPoseAfterBoundary() {
+        let date = makeDate(hour: 10, minute: 11, second: 0, nanosecond: 900_000_000)
+        let engine = ClockClockEngine()
+        let frame = engine.frame(for: date, calendar: calendar)
+
+        XCTAssertNotEqual(frame.poses, DigitGlyph.poses(for: [1, 0, 1, 0]))
+        XCTAssertNotEqual(frame.poses, DigitGlyph.poses(for: [1, 0, 1, 1]))
+    }
+
+    func testTransitionReachesTargetAfterWindow() {
+        let engine = ClockClockEngine()
+        let date = makeDate(
+            hour: 10,
+            minute: 11,
+            second: Int(engine.transitionDuration.rounded(.up)) + 1
+        )
+        let frame = engine.frame(for: date, calendar: calendar)
+
+        XCTAssertEqual(frame.poses, DigitGlyph.poses(for: [1, 0, 1, 1]))
+    }
+
+    func testTransitionIsDeterministicMidTransition() {
+        let date = makeDate(hour: 10, minute: 11, second: 1, nanosecond: 100_000_000)
+        let engine = ClockClockEngine()
+
+        XCTAssertEqual(
+            engine.frame(for: date, calendar: calendar).poses,
+            engine.frame(for: date, calendar: calendar).poses
+        )
+    }
+
+    func testClockSlotsEnumerateRowMajorWithinEachDigit() {
+        let firstDigit = ClockSlot.all.filter { $0.digitIndex == 0 }
+
+        XCTAssertEqual(firstDigit.map(\.row), [0, 0, 0, 1, 1, 1])
+        XCTAssertEqual(firstDigit.map(\.column), [0, 1, 2, 0, 1, 2])
     }
 
     private var calendar: Calendar {
@@ -47,7 +94,7 @@ final class ClockClockEngineTests: XCTestCase {
         return calendar
     }
 
-    private func makeDate(hour: Int, minute: Int, second: Int) -> Date {
+    private func makeDate(hour: Int, minute: Int, second: Int, nanosecond: Int = 0) -> Date {
         calendar.date(
             from: DateComponents(
                 calendar: calendar,
@@ -57,7 +104,8 @@ final class ClockClockEngineTests: XCTestCase {
                 day: 17,
                 hour: hour,
                 minute: minute,
-                second: second
+                second: second,
+                nanosecond: nanosecond
             )
         )!
     }

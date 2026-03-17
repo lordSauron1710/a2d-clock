@@ -10,6 +10,11 @@ struct ClockDisplayView: View {
     var body: some View {
         GeometryReader { proxy in
             let layout = ClockDisplayLayout(size: proxy.size, scaleOption: scaleOption)
+            let burnInTransform = ClockBurnInStrategy.transform(
+                for: date,
+                viewportSize: proxy.size,
+                boardSize: layout.outerSize
+            )
 
             ZStack {
                 Rectangle()
@@ -21,6 +26,13 @@ struct ClockDisplayView: View {
                     .fill(theme.boardFill)
                     .frame(width: layout.innerBoardSize.width, height: layout.innerBoardSize.height)
 
+                ForEach(Array(layout.separatorCenters.enumerated()), id: \.offset) { _, point in
+                    Circle()
+                        .fill(theme.separator.opacity(frame.colonVisible ? 1.0 : 0.2))
+                        .frame(width: layout.separatorSize, height: layout.separatorSize)
+                        .position(point)
+                }
+
                 ForEach(ClockSlot.all) { slot in
                     ClockFaceView(
                         pose: frame.poses[slot.id],
@@ -31,6 +43,9 @@ struct ClockDisplayView: View {
                     .position(layout.position(for: slot))
                 }
             }
+            .offset(x: burnInTransform.xOffset, y: burnInTransform.yOffset)
+            .rotationEffect(.degrees(burnInTransform.rotationDegrees))
+            .scaleEffect(burnInTransform.scale)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
@@ -40,13 +55,15 @@ private struct ClockDisplayLayout {
     let size: CGSize
     let scaleOption: ClockScaleOption
 
-    private let columns: CGFloat = 12
-    private let rows: CGFloat = 2
+    private let logicalWidth = CGFloat(ClockSlot.layoutWidth)
+    private let logicalHeight = CGFloat(ClockSlot.layoutHeight)
+    private let logicalMinX = CGFloat(ClockSlot.all.map(\.position.x).min() ?? 0.0)
+    private let logicalMinY = CGFloat(ClockSlot.all.map(\.position.y).min() ?? 0.0)
 
     var cellSize: CGFloat {
         let availableWidth = size.width * scaleOption.widthFactor
         let availableHeight = size.height * scaleOption.heightFactor
-        return min(availableWidth / columns, availableHeight / rows) * scaleOption.faceScale
+        return min(availableWidth / logicalWidth, availableHeight / logicalHeight) * scaleOption.faceScale
     }
 
     var frameThickness: CGFloat {
@@ -57,8 +74,12 @@ private struct ClockDisplayLayout {
         max(6, cellSize * 0.08)
     }
 
+    var separatorSize: CGFloat {
+        max(6, cellSize * 0.18)
+    }
+
     var innerBoardSize: CGSize {
-        CGSize(width: columns * cellSize, height: rows * cellSize)
+        CGSize(width: logicalWidth * cellSize, height: logicalHeight * cellSize)
     }
 
     var outerSize: CGSize {
@@ -82,12 +103,21 @@ private struct ClockDisplayLayout {
         )
     }
 
-    func position(for slot: ClockSlot) -> CGPoint {
-        let globalColumn = (slot.digitIndex * 3) + slot.column
+    var separatorCenters: [CGPoint] {
+        let leadingEdge = CGFloat(ClockSlot.all.filter { $0.digitIndex == 1 }.map(\.position.x).max() ?? 0.0) + 1.0
+        let trailingEdge = CGFloat(ClockSlot.all.filter { $0.digitIndex == 2 }.map(\.position.x).min() ?? 0.0)
+        let separatorX = boardOrigin.x + (((leadingEdge + trailingEdge) / 2.0) - logicalMinX) * cellSize
 
-        return CGPoint(
-            x: boardOrigin.x + (CGFloat(globalColumn) * cellSize) + (cellSize / 2.0),
-            y: boardOrigin.y + (CGFloat(slot.row) * cellSize) + (cellSize / 2.0)
+        return [
+            CGPoint(x: separatorX, y: boardOrigin.y + (cellSize * 0.72)),
+            CGPoint(x: separatorX, y: boardOrigin.y + (cellSize * 1.28))
+        ]
+    }
+
+    func position(for slot: ClockSlot) -> CGPoint {
+        CGPoint(
+            x: boardOrigin.x + (CGFloat(slot.position.x) - logicalMinX) * cellSize + (cellSize / 2.0),
+            y: boardOrigin.y + (CGFloat(slot.position.y) - logicalMinY) * cellSize + (cellSize / 2.0)
         )
     }
 }

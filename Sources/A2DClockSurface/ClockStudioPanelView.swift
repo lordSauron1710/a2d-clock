@@ -1,15 +1,35 @@
 import A2DClockCore
 import SwiftUI
 
-struct ClockStudioPanelView: View {
-    @Binding var customization: ClockCustomizationStore
-    let theme: ClockTheme
-    let persist: (ClockCustomizationStore) -> Void
+public struct ClockStudioPanelView: View {
+    @Environment(\.colorScheme) private var colorScheme
 
-    var body: some View {
+    @Binding private var customization: ClockCustomizationStore
+
+    private let persist: (ClockCustomizationStore) -> Void
+    private let onClose: () -> Void
+
+    public init(
+        customization: Binding<ClockCustomizationStore>,
+        persist: @escaping (ClockCustomizationStore) -> Void,
+        onClose: @escaping () -> Void
+    ) {
+        self._customization = customization
+        self.persist = persist
+        self.onClose = onClose
+    }
+
+    public var body: some View {
+        let theme = ClockTheme.make(
+            appearanceMode: customization.appearanceMode,
+            systemColorScheme: colorScheme,
+            palette: customization.dialPalette,
+            lumeColor: customization.lumeColor
+        )
+
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
-                StudioHeaderView(customization: $customization, persist: persist)
+                StudioHeaderView(onClose: onClose)
                 StudioHeroView(customization: customization, theme: theme)
 
                 StudioSectionView(
@@ -23,6 +43,23 @@ struct ClockStudioPanelView: View {
                                 isSelected: customization.appearanceMode == mode
                             ) {
                                 customization.appearanceMode = mode
+                                persist(customization)
+                            }
+                        }
+                    }
+                }
+
+                StudioSectionView(
+                    title: "Time Display",
+                    caption: "Switch between classic 12-hour readout and a 24-hour instrument clock."
+                ) {
+                    HStack(spacing: 10) {
+                        ForEach(ClockHourFormat.allCases) { format in
+                            TimeFormatCard(
+                                format: format,
+                                isSelected: customization.hourFormat == format
+                            ) {
+                                customization.hourFormat = format
                                 persist(customization)
                             }
                         }
@@ -70,25 +107,8 @@ struct ClockStudioPanelView: View {
                 }
 
                 StudioSectionView(
-                    title: "Motion",
-                    caption: "Change how the mini dials reorganize themselves at each minute."
-                ) {
-                    VStack(spacing: 10) {
-                        ForEach(ClockMovementStyle.allCases) { style in
-                            MotionCard(
-                                style: style,
-                                isSelected: customization.movementStyle == style
-                            ) {
-                                customization.movementStyle = style
-                                persist(customization)
-                            }
-                        }
-                    }
-                }
-
-                StudioSectionView(
                     title: "Night Glow",
-                    caption: "Pick the glow tone used when the scene enters its darker state."
+                    caption: "Pick the lume tone used when the scene enters its darker state."
                 ) {
                     LazyVGrid(
                         columns: Array(repeating: GridItem(.flexible(minimum: 0), spacing: 10), count: 4),
@@ -122,8 +142,7 @@ struct ClockStudioPanelView: View {
 }
 
 private struct StudioHeaderView: View {
-    @Binding var customization: ClockCustomizationStore
-    let persist: (ClockCustomizationStore) -> Void
+    let onClose: () -> Void
 
     var body: some View {
         HStack(alignment: .top) {
@@ -139,10 +158,7 @@ private struct StudioHeaderView: View {
 
             Spacer()
 
-            Button {
-                customization.isStudioPresented = false
-                persist(customization)
-            } label: {
+            Button(action: onClose) {
                 Image(systemName: "xmark")
                     .font(.system(size: 13, weight: .bold))
                     .foregroundStyle(.primary)
@@ -203,9 +219,9 @@ private struct StudioHeroView: View {
             .frame(height: 170)
 
             HStack(spacing: 8) {
+                SettingBadge(title: customization.hourFormat.title)
                 SettingBadge(title: customization.dialPalette.title)
                 SettingBadge(title: customization.scaleOption.title)
-                SettingBadge(title: customization.movementStyle.title)
             }
         }
     }
@@ -271,6 +287,38 @@ private struct AppearanceCard: View {
             .overlay(
                 RoundedRectangle(cornerRadius: 20, style: .continuous)
                     .strokeBorder(isSelected ? Color.white.opacity(0.3) : Color.black.opacity(0.08), lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+private struct TimeFormatCard: View {
+    let format: ClockHourFormat
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(alignment: .leading, spacing: 10) {
+                Text(format.title)
+                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.primary)
+
+                Text(format.detail)
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity, minHeight: 82, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .fill(Color.white.opacity(isSelected ? 0.18 : 0.08))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .strokeBorder(isSelected ? Color.black.opacity(0.85) : Color.black.opacity(0.08), lineWidth: isSelected ? 2 : 1)
             )
         }
         .buttonStyle(.plain)
@@ -353,84 +401,6 @@ private struct ScaleCard: View {
             )
         }
         .buttonStyle(.plain)
-    }
-}
-
-private struct MotionCard: View {
-    let style: ClockMovementStyle
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 14) {
-                MotionGlyph(style: style, isSelected: isSelected)
-                    .frame(width: 56, height: 40)
-
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(style.title)
-                        .font(.system(size: 13, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.primary)
-
-                    Text(style.detail)
-                        .font(.system(size: 11, weight: .medium, design: .rounded))
-                        .foregroundStyle(.secondary)
-                }
-
-                Spacer()
-            }
-            .padding(14)
-            .background(
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .fill(Color.white.opacity(isSelected ? 0.18 : 0.08))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .strokeBorder(isSelected ? Color.black.opacity(0.85) : Color.black.opacity(0.08), lineWidth: isSelected ? 2 : 1)
-            )
-        }
-        .buttonStyle(.plain)
-    }
-}
-
-private struct MotionGlyph: View {
-    let style: ClockMovementStyle
-    let isSelected: Bool
-
-    var body: some View {
-        GeometryReader { proxy in
-            let width = proxy.size.width
-            let height = proxy.size.height
-
-            Path { path in
-                switch style {
-                case .step:
-                    path.move(to: CGPoint(x: 0, y: height * 0.72))
-                    path.addLine(to: CGPoint(x: width * 0.28, y: height * 0.72))
-                    path.addLine(to: CGPoint(x: width * 0.28, y: height * 0.44))
-                    path.addLine(to: CGPoint(x: width * 0.56, y: height * 0.44))
-                    path.addLine(to: CGPoint(x: width * 0.56, y: height * 0.18))
-                    path.addLine(to: CGPoint(x: width, y: height * 0.18))
-                case .sweep:
-                    path.move(to: CGPoint(x: 0, y: height * 0.78))
-                    path.addQuadCurve(
-                        to: CGPoint(x: width, y: height * 0.16),
-                        control: CGPoint(x: width * 0.56, y: height * 0.1)
-                    )
-                case .glide:
-                    path.move(to: CGPoint(x: 0, y: height * 0.72))
-                    path.addCurve(
-                        to: CGPoint(x: width, y: height * 0.2),
-                        control1: CGPoint(x: width * 0.3, y: height * 0.58),
-                        control2: CGPoint(x: width * 0.7, y: height * 0.32)
-                    )
-                }
-            }
-            .stroke(
-                isSelected ? Color.black : Color.primary.opacity(0.85),
-                style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round)
-            )
-        }
     }
 }
 

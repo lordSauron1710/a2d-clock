@@ -22,7 +22,7 @@ This repository uses a lightweight prompt-driven workflow similar to other repos
 ## Design rules
 
 - Treat this as an ambient object, not a dashboard
-- Motion should feel mechanical, calm, and intentional
+- Motion should feel calm and intentional
 - The grid should stay legible from across a room
 - The visual language should show up in proportion, palette, and restraint
 - Avoid clutter, settings sprawl, and novelty effects

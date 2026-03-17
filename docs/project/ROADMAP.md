@@ -7,18 +7,18 @@
 - Establish a refined visual language with procedural drawing
 - Add tests around digit mapping and minute-boundary behavior
 
-## Milestone 2 — Real ScreenSaver bundle // IN PROGRESS
+## Milestone 2 — Real ScreenSaver bundle // EXECUTED
 
-- Add a ScreenSaver target that reuses `A2DClockCore`
-- Move host-specific setup behind a shared rendering surface
-- Package an installable `.saver`
-- Add a small configuration surface for theme, 12/24-hour mode, and motion style
+- Add a ScreenSaver target that reuses `A2DClockCore` // EXECUTED
+- Move host-specific setup behind a shared rendering surface // EXECUTED
+- Package an installable `.saver` // EXECUTED
+- Add a small configuration surface for theme, 12/24-hour mode, and footprint // EXECUTED
 
-## Milestone 3 — Product polish
+## Milestone 3 — Product polish // IN PROGRESS
 
-- Add multiple dial families and day/night palettes
-- Add configurable movement modes inspired by quartz and mechanical sweep
-- Tune burn-in prevention with longer-term drift and safe repositioning rules
+- Add 16 hand-crafted dial families with day/night palettes // EXECUTED
+- Tune a single digit-change transition with calm, legible hand choreography // EXECUTED
+- Tune burn-in prevention with longer-term drift, safe repositioning rules, and low-power redraw pacing // EXECUTED
 - Benchmark CPU/GPU use on Retina and external displays
 
 ## Milestone 4 — Distribution

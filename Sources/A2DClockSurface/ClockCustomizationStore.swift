@@ -1,36 +1,36 @@
+import A2DClockCore
 import Foundation
 
-struct ClockCustomizationStore: Equatable {
+public struct ClockCustomizationStore: Equatable {
     var appearanceMode: ClockAppearanceMode = .system
+    var hourFormat: ClockHourFormat = .twentyFour
     var dialPalette: ClockDialPalette = .porcelain
     var scaleOption: ClockScaleOption = .gallery
-    var movementStyle: ClockMovementStyle = .sweep
     var lumeColor: ClockLumeColor = .aqua
-    var isStudioPresented = false
 
     private enum Key {
         static let appearanceMode = "clock.appearanceMode"
+        static let hourFormat = "clock.hourFormat"
         static let dialPalette = "clock.dialPalette"
         static let scaleOption = "clock.scaleOption"
-        static let movementStyle = "clock.movementStyle"
         static let lumeColor = "clock.lumeColor"
     }
 
-    static func load(defaults: UserDefaults = .standard) -> Self {
+    public static func load(defaults: UserDefaults = .standard) -> Self {
         Self(
             appearanceMode: ClockAppearanceMode(rawValue: defaults.string(forKey: Key.appearanceMode) ?? "") ?? .system,
+            hourFormat: ClockHourFormat(rawValue: defaults.string(forKey: Key.hourFormat) ?? "") ?? .twentyFour,
             dialPalette: ClockDialPalette(rawValue: defaults.string(forKey: Key.dialPalette) ?? "") ?? .porcelain,
             scaleOption: ClockScaleOption(rawValue: defaults.string(forKey: Key.scaleOption) ?? "") ?? .gallery,
-            movementStyle: ClockMovementStyle(rawValue: defaults.string(forKey: Key.movementStyle) ?? "") ?? .sweep,
             lumeColor: ClockLumeColor(rawValue: defaults.string(forKey: Key.lumeColor) ?? "") ?? .aqua
         )
     }
 
-    func persist(defaults: UserDefaults = .standard) {
+    public func persist(defaults: UserDefaults = .standard) {
         defaults.set(appearanceMode.rawValue, forKey: Key.appearanceMode)
+        defaults.set(hourFormat.rawValue, forKey: Key.hourFormat)
         defaults.set(dialPalette.rawValue, forKey: Key.dialPalette)
         defaults.set(scaleOption.rawValue, forKey: Key.scaleOption)
-        defaults.set(movementStyle.rawValue, forKey: Key.movementStyle)
         defaults.set(lumeColor.rawValue, forKey: Key.lumeColor)
     }
 }

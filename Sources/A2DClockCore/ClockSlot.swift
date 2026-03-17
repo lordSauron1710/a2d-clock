@@ -20,7 +20,7 @@ public struct ClockSlot: Identifiable, Equatable, Sendable {
 
     public static let all: [ClockSlot] = {
         let localCoordinates: [(row: Int, column: Int)] = [
-            (0, 1), (0, 2), (0, 0),
+            (0, 0), (0, 1), (0, 2),
             (1, 0), (1, 1), (1, 2)
         ]
 

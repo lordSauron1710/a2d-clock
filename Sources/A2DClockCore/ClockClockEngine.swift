@@ -7,18 +7,15 @@ public struct ClockClockFrame: Equatable, Sendable {
 }
 
 public struct ClockClockEngine: Sendable {
+    public var hourFormat: ClockHourFormat
     public var transitionDuration: Double
-    public var flourishSplit: Double
-    public var transitionStyle: ClockTransitionStyle
 
     public init(
-        transitionDuration: Double = 2.4,
-        flourishSplit: Double = 0.34,
-        transitionStyle: ClockTransitionStyle = .sweep
+        hourFormat: ClockHourFormat = .twentyFour,
+        transitionDuration: Double = 2.0
     ) {
+        self.hourFormat = hourFormat
         self.transitionDuration = transitionDuration
-        self.flourishSplit = flourishSplit
-        self.transitionStyle = transitionStyle
     }
 
     public func digits(
@@ -26,7 +23,7 @@ public struct ClockClockEngine: Sendable {
         calendar: Calendar = .autoupdatingCurrent
     ) -> [Int] {
         let components = calendar.dateComponents([.hour, .minute], from: date)
-        let hour = components.hour ?? 0
+        let hour = hourFormat.displayHour(from: components.hour ?? 0)
         let minute = components.minute ?? 0
 
         return [
@@ -87,32 +84,40 @@ public struct ClockClockEngine: Sendable {
         }
 
         return ClockSlot.all.enumerated().map { index, slot in
-            switch transitionStyle {
-            case .step:
-                return steppedPose(
-                    from: previous[index],
-                    to: target[index],
-                    slot: slot,
-                    progress: progress
-                )
-            case .sweep:
-                let flourish = flourishPose(for: slot, minuteKey: minuteKey)
-                if progress < flourishSplit {
-                    let localProgress = smoothstep(progress / flourishSplit)
-                    return previous[index].interpolated(to: flourish, progress: localProgress)
-                }
-
-                let localProgress = smoothstep((progress - flourishSplit) / (1.0 - flourishSplit))
-                return flourish.interpolated(to: target[index], progress: localProgress)
-            case .glide:
-                return glidingPose(
-                    from: previous[index],
-                    to: target[index],
-                    slot: slot,
-                    progress: progress
-                )
-            }
+            animatedPose(
+                from: previous[index],
+                to: target[index],
+                slot: slot,
+                progress: progress,
+                minuteKey: minuteKey
+            )
         }
+    }
+
+    private func animatedPose(
+        from previous: ClockPose,
+        to target: ClockPose,
+        slot: ClockSlot,
+        progress: Double,
+        minuteKey: Int
+    ) -> ClockPose {
+        let distance = slotDistance(from: ClockSlot.logicalCenter, to: slot.position)
+        let localDelay = (distance * 0.034) + (Double(slot.row) * 0.02) + (Double(slot.column) * 0.012)
+        let localProgress = smoothstep(((progress - localDelay) / 0.82).clamped(to: 0.0 ... 1.0))
+        let flourish = flourishPose(for: slot, minuteKey: minuteKey)
+
+        if localProgress < 0.44 {
+            let flourishProgress = smoothstep(localProgress / 0.44)
+            return previous.interpolated(to: flourish, progress: flourishProgress)
+        }
+
+        let settleProgress = ((localProgress - 0.44) / 0.56).clamped(to: 0.0 ... 1.0)
+        return settledPose(
+            from: flourish,
+            to: target,
+            progress: settleProgress,
+            overshoot: 0.04
+        )
     }
 
     private func flourishPose(for slot: ClockSlot, minuteKey: Int) -> ClockPose {
@@ -120,45 +125,62 @@ public struct ClockClockEngine: Sendable {
         let dx = slot.position.x - center.x
         let dy = slot.position.y - center.y
         let baseAngle = atan2(dy, dx) + (.pi / 2.0)
-        let seed = Double((minuteKey * 19) + (slot.id * 7))
-        let jitter = sin(seed) * 0.28
-        let spread = (.pi / 2.4) + (Double(slot.localIndex % 3) * 0.12)
+        let directionalBias = Double((minuteKey + slot.digitIndex) % 3 - 1) * 0.05
+        let spread = 0.42 + (Double(slot.column) * 0.06)
 
         return ClockPose(
-            hourAngle: baseAngle + jitter - spread,
-            minuteAngle: baseAngle + jitter + spread
+            hourAngle: baseAngle + directionalBias - spread,
+            minuteAngle: baseAngle + directionalBias + spread
         )
+    }
+
+    private func settledPose(
+        from source: ClockPose,
+        to target: ClockPose,
+        progress: Double,
+        overshoot: Double
+    ) -> ClockPose {
+        let overshootPose = overshootingPose(from: source, to: target, amount: overshoot)
+
+        if progress < 0.84 {
+            let localProgress = smoothstep(progress / 0.84)
+            return source.interpolated(to: overshootPose, progress: localProgress)
+        }
+
+        let localProgress = smoothstep((progress - 0.84) / 0.16)
+        return overshootPose.interpolated(to: target, progress: localProgress)
+    }
+
+    private func overshootingPose(
+        from source: ClockPose,
+        to target: ClockPose,
+        amount: Double
+    ) -> ClockPose {
+        ClockPose(
+            hourAngle: target.hourAngle + shortestDelta(from: source.hourAngle, to: target.hourAngle) * amount,
+            minuteAngle: target.minuteAngle + shortestDelta(from: source.minuteAngle, to: target.minuteAngle) * amount
+        )
+    }
+
+    private func slotDistance(from start: LogicalPoint, to end: LogicalPoint) -> Double {
+        let dx = end.x - start.x
+        let dy = end.y - start.y
+        return sqrt((dx * dx) + (dy * dy))
+    }
+
+    private func shortestDelta(from start: Double, to end: Double) -> Double {
+        let turn = .pi * 2.0
+        var delta = (end - start).truncatingRemainder(dividingBy: turn)
+        if delta > .pi {
+            delta -= turn
+        } else if delta < -.pi {
+            delta += turn
+        }
+        return delta
     }
 
     private func smoothstep(_ value: Double) -> Double {
         let clamped = value.clamped(to: 0.0 ... 1.0)
         return clamped * clamped * (3.0 - (2.0 * clamped))
-    }
-
-    private func steppedPose(
-        from previous: ClockPose,
-        to target: ClockPose,
-        slot: ClockSlot,
-        progress: Double
-    ) -> ClockPose {
-        let groupDelay = (Double(slot.row) * 0.1) + (Double(slot.digitIndex) * 0.035)
-        let localProgress = ((progress - groupDelay) / 0.58).clamped(to: 0.0 ... 1.0)
-        let steppedProgress = floor(localProgress * 4.0) / 4.0
-        return previous.interpolated(to: target, progress: smoothstep(steppedProgress))
-    }
-
-    private func glidingPose(
-        from previous: ClockPose,
-        to target: ClockPose,
-        slot: ClockSlot,
-        progress: Double
-    ) -> ClockPose {
-        let center = ClockSlot.logicalCenter
-        let dx = slot.position.x - center.x
-        let dy = slot.position.y - center.y
-        let distance = sqrt((dx * dx) + (dy * dy))
-        let delay = distance * 0.028
-        let localProgress = smoothstep(((progress - delay) / 0.84).clamped(to: 0.0 ... 1.0))
-        return previous.interpolated(to: target, progress: localProgress)
     }
 }

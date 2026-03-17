@@ -2,7 +2,6 @@ import SwiftUI
 
 struct AmbientBackdropView: View {
     let theme: ClockTheme
-    let date: Date
 
     var body: some View {
         GeometryReader { proxy in
