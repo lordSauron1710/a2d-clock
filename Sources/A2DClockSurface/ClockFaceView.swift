@@ -21,9 +21,9 @@ struct ClockFaceView: View {
                 in: &context,
                 center: center,
                 angle: pose.hourAngle,
-                radius: radius * 0.66,
+                radius: radius * 0.74,
                 backRadius: 0,
-                lineWidth: radius * 0.12,
+                lineWidth: radius * 0.1,
                 color: theme.handColor
             )
 
@@ -31,9 +31,9 @@ struct ClockFaceView: View {
                 in: &context,
                 center: center,
                 angle: pose.minuteAngle,
-                radius: radius * 0.66,
+                radius: radius * 0.74,
                 backRadius: 0,
-                lineWidth: radius * 0.12,
+                lineWidth: radius * 0.1,
                 color: theme.handSecondaryColor
             )
 

@@ -16,3 +16,4 @@
 - Added a working `ScreenSaverView` entrypoint plus a configurable `.saver` build pipeline
 - Added local-only install tooling that stages the saver into `~/Library/Screen Savers` without a system-wide installer
 - Switched the current visual treatment to a white field with black hands and removed stale movement-mode UI
+- Corrected the clock to use the intended 3x2 glyph topology and tightened idle cadence so second-driven state stays aligned with system time

@@ -57,6 +57,7 @@ private struct ClockDisplayLayout {
 
     private let logicalWidth = CGFloat(ClockSlot.layoutWidth)
     private let logicalHeight = CGFloat(ClockSlot.layoutHeight)
+    private let digitRows = CGFloat(ClockSlot.digitRows)
     private let logicalMinX = CGFloat(ClockSlot.all.map(\.position.x).min() ?? 0.0)
     private let logicalMinY = CGFloat(ClockSlot.all.map(\.position.y).min() ?? 0.0)
 
@@ -75,7 +76,7 @@ private struct ClockDisplayLayout {
     }
 
     var separatorSize: CGFloat {
-        max(6, cellSize * 0.18)
+        max(5, cellSize * 0.14)
     }
 
     var innerBoardSize: CGSize {
@@ -109,8 +110,8 @@ private struct ClockDisplayLayout {
         let separatorX = boardOrigin.x + (((leadingEdge + trailingEdge) / 2.0) - logicalMinX) * cellSize
 
         return [
-            CGPoint(x: separatorX, y: boardOrigin.y + (cellSize * 0.72)),
-            CGPoint(x: separatorX, y: boardOrigin.y + (cellSize * 1.28))
+            CGPoint(x: separatorX, y: boardOrigin.y + ((digitRows / 3.0) * cellSize)),
+            CGPoint(x: separatorX, y: boardOrigin.y + (((digitRows * 2.0) / 3.0) * cellSize))
         ]
     }
 

@@ -38,6 +38,10 @@ let package = Package(
         .testTarget(
             name: "A2DClockCoreTests",
             dependencies: ["A2DClockCore"]
+        ),
+        .testTarget(
+            name: "A2DClockSurfaceTests",
+            dependencies: ["A2DClockSurface"]
         )
     ]
 )

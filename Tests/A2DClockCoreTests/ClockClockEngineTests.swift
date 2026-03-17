@@ -16,11 +16,36 @@ final class ClockClockEngineTests: XCTestCase {
         XCTAssertEqual(glyph[5], .clockUnits(9, 9))
     }
 
+    func testDigitZeroFormsThreeByTwoOutline() {
+        let glyph = DigitGlyph.poses(for: 0)
+
+        XCTAssertEqual(glyph[0], .clockUnits(6, 3))
+        XCTAssertEqual(glyph[1], .clockUnits(9, 6))
+        XCTAssertEqual(glyph[2], .clockUnits(0, 6))
+        XCTAssertEqual(glyph[3], .clockUnits(0, 6))
+        XCTAssertEqual(glyph[4], .clockUnits(0, 3))
+        XCTAssertEqual(glyph[5], .clockUnits(9, 0))
+    }
+
     func testEngineUsesTwentyFourHourDigits() {
         let date = makeDate(hour: 13, minute: 5, second: 30)
         let engine = ClockClockEngine()
 
         XCTAssertEqual(engine.digits(for: date, calendar: calendar), [1, 3, 0, 5])
+    }
+
+    func testEngineUsesTwentyFourHourDigitsForEveningTime() {
+        let date = makeDate(hour: 18, minute: 30, second: 0)
+        let engine = ClockClockEngine(hourFormat: .twentyFour)
+
+        XCTAssertEqual(engine.digits(for: date, calendar: calendar), [1, 8, 3, 0])
+    }
+
+    func testEngineUsesTwentyFourHourDigitsAtMidnight() {
+        let date = makeDate(hour: 0, minute: 0, second: 0)
+        let engine = ClockClockEngine(hourFormat: .twentyFour)
+
+        XCTAssertEqual(engine.digits(for: date, calendar: calendar), [0, 0, 0, 0])
     }
 
     func testEngineUsesTwelveHourDigits() {
@@ -84,8 +109,8 @@ final class ClockClockEngineTests: XCTestCase {
     func testClockSlotsEnumerateRowMajorWithinEachDigit() {
         let firstDigit = ClockSlot.all.filter { $0.digitIndex == 0 }
 
-        XCTAssertEqual(firstDigit.map(\.row), [0, 0, 0, 1, 1, 1])
-        XCTAssertEqual(firstDigit.map(\.column), [0, 1, 2, 0, 1, 2])
+        XCTAssertEqual(firstDigit.map(\.row), [0, 0, 1, 1, 2, 2])
+        XCTAssertEqual(firstDigit.map(\.column), [0, 1, 0, 1, 0, 1])
     }
 
     private var calendar: Calendar {

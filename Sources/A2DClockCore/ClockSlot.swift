@@ -18,10 +18,16 @@ public struct ClockSlot: Identifiable, Equatable, Sendable {
     public let column: Int
     public let position: LogicalPoint
 
+    public static let digitColumns = 2
+    public static let digitRows = 3
+    public static let standardGap = 0.72
+    public static let centerGap = 1.28
+
     public static let all: [ClockSlot] = {
         let localCoordinates: [(row: Int, column: Int)] = [
-            (0, 0), (0, 1), (0, 2),
-            (1, 0), (1, 1), (1, 2)
+            (0, 0), (0, 1),
+            (1, 0), (1, 1),
+            (2, 0), (2, 1)
         ]
 
         return (0 ..< 4).flatMap { digitIndex in
@@ -52,7 +58,7 @@ public struct ClockSlot: Identifiable, Equatable, Sendable {
     }
 
     public static var layoutHeight: Double {
-        2.0
+        Double(digitRows)
     }
 
     public static var logicalCenter: LogicalPoint {
@@ -70,8 +76,7 @@ public struct ClockSlot: Identifiable, Equatable, Sendable {
     }
 
     private static func xOffset(for digitIndex: Int) -> Double {
-        let standardGap = 0.55
-        let centerGap = 1.15
-        return (Double(digitIndex) * (3.0 + standardGap)) + (digitIndex >= 2 ? centerGap : 0.0)
+        let digitWidth = Double(digitColumns)
+        return (Double(digitIndex) * (digitWidth + standardGap)) + (digitIndex >= 2 ? centerGap : 0.0)
     }
 }
