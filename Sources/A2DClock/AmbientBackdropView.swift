@@ -1,7 +1,7 @@
 import SwiftUI
 
-struct BauhausBackdropView: View {
-    let theme: BauhausTheme
+struct AmbientBackdropView: View {
+    let theme: ClockTheme
     let date: Date
 
     var body: some View {

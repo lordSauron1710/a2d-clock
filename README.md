@@ -1,18 +1,13 @@
 # a2d-clock
 
-A Bauhaus-inspired macOS clock screensaver prototype built as a "clock-clock": 24 small analog faces choreograph themselves into four digital time digits.
-
-This project combines two reference directions:
-
-- [Bauhaus Clock](https://bauhausclock.com/) for material feel, dial craft, and ambient Mac screensaver presentation
-- [Arduino's analog-faces clock post](https://x.com/arduino/status/1367901925086294024) for the grid-based digital choreography made from many miniature clocks
+A native macOS clock screensaver prototype where 24 animated analog faces form four digital time digits.
 
 ## What it does
 
 Build a native macOS screen-object that feels calm from a distance and satisfying up close:
 
 - a 24-face analog grid that reads as digital time
-- dial styling that borrows from premium watch and Bauhaus details
+- dial styling that emphasizes proportion, material feel, and restrained detail
 - screensaver behavior rather than app behavior: full screen, no chrome, slow drift, low distraction
 - a rendering core that can later be reused inside a real `.saver` bundle
 
@@ -77,4 +72,4 @@ See [docs/project/ROADMAP.md](docs/project/ROADMAP.md) for the packaging plan.
 
 ## Attribution
 
-This project is an original prototype inspired by external references. It is not affiliated with Bauhaus Clock, Arduino, or Humans since 1982.
+This project is an original clock screensaver prototype built for this repository.

@@ -4,7 +4,7 @@
 
 - Create a reusable clock-core module for glyph mapping and time transitions
 - Build a macOS full-screen host app that behaves like a screensaver
-- Establish a Bauhaus-inspired visual language with procedural drawing
+- Establish a refined visual language with procedural drawing
 - Add tests around digit mapping and minute-boundary behavior
 
 ## Milestone 2 — Real ScreenSaver bundle // IN PROGRESS

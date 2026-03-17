@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct BauhausTheme {
+struct ClockTheme {
     let backgroundTop: Color
     let backgroundBottom: Color
     let vignette: Color

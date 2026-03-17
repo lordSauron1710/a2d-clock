@@ -8,11 +8,11 @@ struct ScreensaverHostView: View {
 
     var body: some View {
         TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { context in
-            let theme = BauhausTheme.forColorScheme(colorScheme)
+            let theme = ClockTheme.forColorScheme(colorScheme)
             let frame = engine.frame(for: context.date)
 
             ZStack {
-                BauhausBackdropView(theme: theme, date: context.date)
+                AmbientBackdropView(theme: theme, date: context.date)
                 ClockDisplayView(frame: frame, theme: theme, date: context.date)
                 ScreensaverWindowReader()
             }

@@ -3,7 +3,7 @@ import SwiftUI
 
 struct ClockDisplayView: View {
     let frame: ClockClockFrame
-    let theme: BauhausTheme
+    let theme: ClockTheme
     let date: Date
 
     var body: some View {
@@ -82,7 +82,7 @@ private struct ClockDisplayLayout {
 
 private struct SeparatorDotsView: View {
     let layout: ClockDisplayLayout
-    let theme: BauhausTheme
+    let theme: ClockTheme
     let visible: Bool
 
     var body: some View {

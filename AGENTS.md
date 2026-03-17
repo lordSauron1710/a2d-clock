@@ -24,7 +24,7 @@ This repository uses a lightweight prompt-driven workflow similar to other repos
 - Treat this as an ambient object, not a dashboard
 - Motion should feel mechanical, calm, and intentional
 - The grid should stay legible from across a room
-- Bauhaus influence should show up in proportion, palette, and restraint
+- The visual language should show up in proportion, palette, and restraint
 - Avoid clutter, settings sprawl, and novelty effects
 
 ## File structure

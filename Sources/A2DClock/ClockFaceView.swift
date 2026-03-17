@@ -3,7 +3,7 @@ import SwiftUI
 
 struct ClockFaceView: View {
     let pose: ClockPose
-    let theme: BauhausTheme
+    let theme: ClockTheme
     let faceFill: Color
 
     var body: some View {
