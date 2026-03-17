@@ -4,11 +4,11 @@ This repository uses a lightweight prompt-driven workflow similar to other repos
 
 ## Agent responsibilities
 
-- Read `ROADMAP.md` before making significant changes
+- Read `docs/project/ROADMAP.md` before making significant changes
 - Mark roadmap items with `// IN PROGRESS` or `// EXECUTED` once work begins
 - Preserve the split between reusable clock logic and the macOS host app
 - Keep the project native, local-first, and low-complexity
-- Update `CHANGES.md` when a meaningful milestone lands
+- Update `docs/project/CHANGES.md` when a meaningful milestone lands
 
 ## Build rules
 
@@ -34,6 +34,6 @@ This repository uses a lightweight prompt-driven workflow similar to other repos
 /Sources/A2DClock         Native app host, full-screen behavior, drawing
 /Tests/A2DClockCoreTests  Unit tests for the clock logic
 README.md                 Project overview and run instructions
-ROADMAP.md                Milestones and future packaging work
-CHANGES.md                Lightweight change timeline
+docs/project/ROADMAP.md   Milestones and future packaging work
+docs/project/CHANGES.md   Lightweight change timeline
 ```

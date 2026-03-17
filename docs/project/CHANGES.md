@@ -5,5 +5,5 @@
 - Scaffolded `a2d-clock` as a native macOS Swift package
 - Added `A2DClockCore` for digit glyphs, layout metadata, and transition timing
 - Built a full-screen screensaver-style prototype with 24 analog mini-dials
-- Added repo workflow docs: `README.md`, `AGENTS.md`, `ROADMAP.md`
+- Added repo workflow docs: `README.md`, `AGENTS.md`, `docs/project/ROADMAP.md`
 - Added unit tests for the core time/digit engine

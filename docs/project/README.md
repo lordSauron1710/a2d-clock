@@ -9,4 +9,4 @@ Current intent:
 - keep the motion/rendering core reusable
 - graduate the renderer into a real `.saver` target once the look and behavior are stable
 
-Primary planning lives in the repo root at [ROADMAP.md](../../ROADMAP.md).
+Primary planning lives alongside this note in [ROADMAP.md](ROADMAP.md).

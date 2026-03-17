@@ -29,8 +29,8 @@ docs/
   project/              Project-level notes and direction
   screenshots/          Placeholder for future captures and demo stills
 AGENTS.md               Working rules for future agent sessions
-ROADMAP.md              Milestones and packaging path
-CHANGES.md              Lightweight timeline of repo work
+docs/project/ROADMAP.md Milestones and packaging path
+docs/project/CHANGES.md Lightweight timeline of repo work
 ```
 
 ## Prerequisites
@@ -64,8 +64,8 @@ swift test
 ## Documentation map
 
 - [AGENTS.md](AGENTS.md)
-- [ROADMAP.md](ROADMAP.md)
-- [CHANGES.md](CHANGES.md)
+- [docs/project/ROADMAP.md](docs/project/ROADMAP.md)
+- [docs/project/CHANGES.md](docs/project/CHANGES.md)
 - [docs/project/README.md](docs/project/README.md)
 - [docs/policies/POLICY_INDEX.md](docs/policies/POLICY_INDEX.md)
 
@@ -73,7 +73,7 @@ swift test
 
 This first milestone is intentionally a prototype host app. The next step is to reuse `A2DClockCore` inside a ScreenSaver target and package it as an installable `.saver`.
 
-See [ROADMAP.md](ROADMAP.md) for the packaging plan.
+See [docs/project/ROADMAP.md](docs/project/ROADMAP.md) for the packaging plan.
 
 ## Attribution
 
