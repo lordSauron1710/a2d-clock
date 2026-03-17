@@ -1,6 +1,6 @@
 # a2d-clock
 
-A native macOS clock screensaver prototype where 24 animated analog faces form four digital time digits.
+A native macOS clock screensaver prototype where 24 animated analog faces form four digital time digits, with a built-in live tuning studio for appearance, palette, scale, motion, and night glow.
 
 ## What it does
 
@@ -39,8 +39,10 @@ The repository currently ships a native macOS prototype using SwiftUI + AppKit:
 
 - full-screen launch behavior
 - 24 analog mini-dials arranged into `HHMM`
-- minute-change choreography with a burst-and-settle transition
-- light and dark visual themes
+- a slide-over studio panel with live customization controls
+- three movement modes: Step, Sweep, and Glide
+- switchable appearance modes plus multiple dial palettes
+- size and night-glow tuning
 - subtle whole-scene drift to reduce burn-in risk
 - reusable clock layout and digit engine in `A2DClockCore`
 

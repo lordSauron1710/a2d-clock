@@ -23,7 +23,6 @@ struct ScreensaverWindowReader: NSViewRepresentable {
     final class Coordinator {
         private var didConfigureAppearance = false
         private var didRequestFullScreen = false
-        private var didHideCursor = false
 
         @MainActor
         func configure(window: NSWindow) {
@@ -40,11 +39,6 @@ struct ScreensaverWindowReader: NSViewRepresentable {
                 window.standardWindowButton(.closeButton)?.isHidden = true
                 window.standardWindowButton(.miniaturizeButton)?.isHidden = true
                 window.standardWindowButton(.zoomButton)?.isHidden = true
-            }
-
-            if !didHideCursor {
-                didHideCursor = true
-                NSCursor.hide()
             }
 
             if !didRequestFullScreen {

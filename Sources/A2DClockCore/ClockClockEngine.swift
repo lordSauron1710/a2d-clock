@@ -9,13 +9,16 @@ public struct ClockClockFrame: Equatable, Sendable {
 public struct ClockClockEngine: Sendable {
     public var transitionDuration: Double
     public var flourishSplit: Double
+    public var transitionStyle: ClockTransitionStyle
 
     public init(
         transitionDuration: Double = 2.4,
-        flourishSplit: Double = 0.34
+        flourishSplit: Double = 0.34,
+        transitionStyle: ClockTransitionStyle = .sweep
     ) {
         self.transitionDuration = transitionDuration
         self.flourishSplit = flourishSplit
+        self.transitionStyle = transitionStyle
     }
 
     public func digits(
@@ -84,14 +87,31 @@ public struct ClockClockEngine: Sendable {
         }
 
         return ClockSlot.all.enumerated().map { index, slot in
-            let flourish = flourishPose(for: slot, minuteKey: minuteKey)
-            if progress < flourishSplit {
-                let localProgress = smoothstep(progress / flourishSplit)
-                return previous[index].interpolated(to: flourish, progress: localProgress)
-            }
+            switch transitionStyle {
+            case .step:
+                return steppedPose(
+                    from: previous[index],
+                    to: target[index],
+                    slot: slot,
+                    progress: progress
+                )
+            case .sweep:
+                let flourish = flourishPose(for: slot, minuteKey: minuteKey)
+                if progress < flourishSplit {
+                    let localProgress = smoothstep(progress / flourishSplit)
+                    return previous[index].interpolated(to: flourish, progress: localProgress)
+                }
 
-            let localProgress = smoothstep((progress - flourishSplit) / (1.0 - flourishSplit))
-            return flourish.interpolated(to: target[index], progress: localProgress)
+                let localProgress = smoothstep((progress - flourishSplit) / (1.0 - flourishSplit))
+                return flourish.interpolated(to: target[index], progress: localProgress)
+            case .glide:
+                return glidingPose(
+                    from: previous[index],
+                    to: target[index],
+                    slot: slot,
+                    progress: progress
+                )
+            }
         }
     }
 
@@ -113,5 +133,32 @@ public struct ClockClockEngine: Sendable {
     private func smoothstep(_ value: Double) -> Double {
         let clamped = value.clamped(to: 0.0 ... 1.0)
         return clamped * clamped * (3.0 - (2.0 * clamped))
+    }
+
+    private func steppedPose(
+        from previous: ClockPose,
+        to target: ClockPose,
+        slot: ClockSlot,
+        progress: Double
+    ) -> ClockPose {
+        let groupDelay = (Double(slot.row) * 0.1) + (Double(slot.digitIndex) * 0.035)
+        let localProgress = ((progress - groupDelay) / 0.58).clamped(to: 0.0 ... 1.0)
+        let steppedProgress = floor(localProgress * 4.0) / 4.0
+        return previous.interpolated(to: target, progress: smoothstep(steppedProgress))
+    }
+
+    private func glidingPose(
+        from previous: ClockPose,
+        to target: ClockPose,
+        slot: ClockSlot,
+        progress: Double
+    ) -> ClockPose {
+        let center = ClockSlot.logicalCenter
+        let dx = slot.position.x - center.x
+        let dy = slot.position.y - center.y
+        let distance = sqrt((dx * dx) + (dy * dy))
+        let delay = distance * 0.028
+        let localProgress = smoothstep(((progress - delay) / 0.84).clamped(to: 0.0 ... 1.0))
+        return previous.interpolated(to: target, progress: localProgress)
     }
 }

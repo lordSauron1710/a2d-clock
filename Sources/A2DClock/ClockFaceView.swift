@@ -11,79 +11,50 @@ struct ClockFaceView: View {
             let rect = CGRect(origin: .zero, size: size)
             let radius = min(size.width, size.height) * 0.5
             let center = CGPoint(x: rect.midX, y: rect.midY)
-            let facePath = Path(ellipseIn: rect.insetBy(dx: radius * 0.05, dy: radius * 0.05))
+            let cellRect = rect.insetBy(dx: size.width * 0.008, dy: size.height * 0.008)
+            let cellPath = Path(cellRect)
 
-            context.fill(
-                facePath,
-                with: .radialGradient(
-                    Gradient(colors: [faceFill.opacity(0.98), faceFill.opacity(0.7)]),
-                    center: center,
-                    startRadius: radius * 0.12,
-                    endRadius: radius * 1.02
-                )
-            )
-
-            context.stroke(
-                facePath,
-                with: .color(theme.faceRim),
-                lineWidth: radius * 0.06
-            )
-
-            let glossRect = CGRect(
-                x: rect.minX + radius * 0.28,
-                y: rect.minY + radius * 0.18,
-                width: radius * 0.92,
-                height: radius * 0.52
-            )
-            context.fill(Path(ellipseIn: glossRect), with: .color(theme.faceGloss))
-
-            for tickIndex in 0 ..< 60 {
-                let angle = (Double(tickIndex) / 60.0) * (.pi * 2.0)
-                let isMajor = tickIndex.isMultiple(of: 5)
-                let innerRadius = radius * (isMajor ? 0.63 : 0.76)
-                let outerRadius = radius * 0.86
-
-                var path = Path()
-                path.move(to: point(from: center, radius: innerRadius, angle: angle))
-                path.addLine(to: point(from: center, radius: outerRadius, angle: angle))
-
-                context.stroke(
-                    path,
-                    with: .color(isMajor ? theme.majorTick : theme.minorTick),
-                    lineWidth: radius * (isMajor ? 0.05 : 0.018)
-                )
-            }
+            context.fill(cellPath, with: .color(faceFill))
+            context.stroke(cellPath, with: .color(theme.cellStroke), lineWidth: max(1.0, size.width * 0.012))
 
             drawHand(
                 in: &context,
                 center: center,
                 angle: pose.hourAngle,
-                radius: radius * 0.48,
-                backRadius: radius * 0.14,
-                lineWidth: radius * 0.08,
-                color: theme.hourHand
+                radius: radius * 0.66,
+                backRadius: 0,
+                lineWidth: radius * 0.12,
+                color: theme.handColor
             )
 
             drawHand(
                 in: &context,
                 center: center,
                 angle: pose.minuteAngle,
-                radius: radius * 0.77,
-                backRadius: radius * 0.14,
-                lineWidth: radius * 0.056,
-                color: theme.minuteHand
+                radius: radius * 0.66,
+                backRadius: 0,
+                lineWidth: radius * 0.12,
+                color: theme.handSecondaryColor
             )
 
             let capRect = CGRect(
-                x: center.x - (radius * 0.12),
-                y: center.y - (radius * 0.12),
-                width: radius * 0.24,
-                height: radius * 0.24
+                x: center.x - (radius * 0.055),
+                y: center.y - (radius * 0.055),
+                width: radius * 0.11,
+                height: radius * 0.11
             )
 
-            context.fill(Path(ellipseIn: capRect), with: .color(theme.centerCap))
+            context.fill(Path(ellipseIn: capRect), with: .color(theme.hubColor))
         }
-        .shadow(color: theme.shadow, radius: 16, x: 0, y: 8)
+        .shadow(color: theme.shadow.opacity(0.18), radius: 1, x: 0, y: 1)
+        .overlay {
+            if theme.isNight && theme.handGlow != .clear {
+                Rectangle()
+                    .stroke(theme.handGlow, lineWidth: 1)
+                    .blur(radius: 6)
+                    .padding(8)
+            }
+        }
     }
 
     private func drawHand(
