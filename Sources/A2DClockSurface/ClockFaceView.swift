@@ -4,56 +4,32 @@ import SwiftUI
 struct ClockFaceView: View {
     let pose: ClockPose
     let theme: ClockTheme
-    let faceFill: Color
 
     var body: some View {
         Canvas { context, size in
             let rect = CGRect(origin: .zero, size: size)
             let radius = min(size.width, size.height) * 0.5
             let center = CGPoint(x: rect.midX, y: rect.midY)
-            let cellRect = rect.insetBy(dx: size.width * 0.008, dy: size.height * 0.008)
-            let cellPath = Path(cellRect)
-
-            context.fill(cellPath, with: .color(faceFill))
-            context.stroke(cellPath, with: .color(theme.cellStroke), lineWidth: max(1.0, size.width * 0.012))
 
             drawHand(
                 in: &context,
                 center: center,
                 angle: pose.hourAngle,
-                radius: radius * 0.74,
-                backRadius: 0,
-                lineWidth: radius * 0.1,
-                color: theme.handColor
+                radius: radius * 0.84,
+                lineWidth: radius * 0.19,
+                color: theme.handColor,
+                opacity: pose.hourOpacity
             )
 
             drawHand(
                 in: &context,
                 center: center,
                 angle: pose.minuteAngle,
-                radius: radius * 0.74,
-                backRadius: 0,
-                lineWidth: radius * 0.1,
-                color: theme.handSecondaryColor
+                radius: radius * 0.84,
+                lineWidth: radius * 0.19,
+                color: theme.handColor,
+                opacity: pose.minuteOpacity
             )
-
-            let capRect = CGRect(
-                x: center.x - (radius * 0.055),
-                y: center.y - (radius * 0.055),
-                width: radius * 0.11,
-                height: radius * 0.11
-            )
-
-            context.fill(Path(ellipseIn: capRect), with: .color(theme.hubColor))
-        }
-        .shadow(color: theme.shadow.opacity(0.18), radius: 1, x: 0, y: 1)
-        .overlay {
-            if theme.isNight && theme.handGlow != .clear {
-                Rectangle()
-                    .stroke(theme.handGlow, lineWidth: 1)
-                    .blur(radius: 6)
-                    .padding(8)
-            }
         }
     }
 
@@ -62,19 +38,28 @@ struct ClockFaceView: View {
         center: CGPoint,
         angle: Double,
         radius: CGFloat,
-        backRadius: CGFloat,
         lineWidth: CGFloat,
-        color: Color
+        color: Color,
+        opacity: Double
     ) {
-        var handPath = Path()
-        handPath.move(to: point(from: center, radius: backRadius, angle: angle + .pi))
-        handPath.addLine(to: point(from: center, radius: radius, angle: angle))
+        guard opacity > 0.001 else {
+            return
+        }
 
-        context.stroke(
-            handPath,
-            with: .color(color),
-            style: StrokeStyle(lineWidth: lineWidth, lineCap: .round)
+        let endPoint = point(from: center, radius: radius, angle: angle)
+        let perpendicular = CGPoint(
+            x: cos(angle) * (lineWidth / 2.0),
+            y: sin(angle) * (lineWidth / 2.0)
         )
+
+        var handPath = Path()
+        handPath.move(to: CGPoint(x: center.x - perpendicular.x, y: center.y + perpendicular.y))
+        handPath.addLine(to: CGPoint(x: center.x + perpendicular.x, y: center.y - perpendicular.y))
+        handPath.addLine(to: CGPoint(x: endPoint.x + perpendicular.x, y: endPoint.y - perpendicular.y))
+        handPath.addLine(to: CGPoint(x: endPoint.x - perpendicular.x, y: endPoint.y + perpendicular.y))
+        handPath.closeSubpath()
+
+        context.fill(handPath, with: .color(color.opacity(opacity)))
     }
 
     private func point(from center: CGPoint, radius: CGFloat, angle: Double) -> CGPoint {

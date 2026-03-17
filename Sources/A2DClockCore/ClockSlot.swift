@@ -20,8 +20,8 @@ public struct ClockSlot: Identifiable, Equatable, Sendable {
 
     public static let digitColumns = 2
     public static let digitRows = 3
-    public static let standardGap = 0.72
-    public static let centerGap = 1.28
+    public static let standardGap = 0.12
+    public static let centerGap = 0.18
 
     public static let all: [ClockSlot] = {
         let localCoordinates: [(row: Int, column: Int)] = [

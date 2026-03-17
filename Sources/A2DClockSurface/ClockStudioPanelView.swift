@@ -2,8 +2,6 @@ import A2DClockCore
 import SwiftUI
 
 public struct ClockStudioPanelView: View {
-    @Environment(\.colorScheme) private var colorScheme
-
     @Binding private var customization: ClockCustomizationStore
 
     private let persist: (ClockCustomizationStore) -> Void
@@ -20,38 +18,16 @@ public struct ClockStudioPanelView: View {
     }
 
     public var body: some View {
-        let theme = ClockTheme.make(
-            appearanceMode: customization.appearanceMode,
-            systemColorScheme: colorScheme,
-            palette: customization.dialPalette,
-            lumeColor: customization.lumeColor
-        )
+        let theme = ClockTheme.make(palette: customization.dialPalette)
 
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
                 StudioHeaderView(onClose: onClose)
-                StudioHeroView(customization: customization, theme: theme)
-
-                StudioSectionView(
-                    title: "Atmosphere",
-                    caption: "Choose whether the scene follows the system or keeps its own mood."
-                ) {
-                    HStack(spacing: 10) {
-                        ForEach(ClockAppearanceMode.allCases) { mode in
-                            AppearanceCard(
-                                mode: mode,
-                                isSelected: customization.appearanceMode == mode
-                            ) {
-                                customization.appearanceMode = mode
-                                persist(customization)
-                            }
-                        }
-                    }
-                }
+                StudioHeroView(theme: theme)
 
                 StudioSectionView(
                     title: "Time Display",
-                    caption: "Switch between classic 12-hour readout and a 24-hour instrument clock."
+                    caption: "Switch between 12-hour and 24-hour time while the entire clock transitions together."
                 ) {
                     HStack(spacing: 10) {
                         ForEach(ClockHourFormat.allCases) { format in
@@ -67,8 +43,8 @@ public struct ClockStudioPanelView: View {
                 }
 
                 StudioSectionView(
-                    title: "Dial Palette",
-                    caption: "Each palette changes the backdrop and the dial family together."
+                    title: "Background",
+                    caption: "Choose one of five simple background colors. The hands stay black."
                 ) {
                     LazyVGrid(
                         columns: [
@@ -90,39 +66,12 @@ public struct ClockStudioPanelView: View {
                 }
 
                 StudioSectionView(
-                    title: "Footprint",
-                    caption: "Switch between a room-scale composition and a tighter edition."
+                    title: "Clock Size",
+                    caption: "Scale the composition continuously from restrained to wall-sized."
                 ) {
-                    HStack(spacing: 10) {
-                        ForEach(ClockScaleOption.allCases) { option in
-                            ScaleCard(
-                                option: option,
-                                isSelected: customization.scaleOption == option
-                            ) {
-                                customization.scaleOption = option
-                                persist(customization)
-                            }
-                        }
-                    }
-                }
-
-                StudioSectionView(
-                    title: "Night Glow",
-                    caption: "Pick the lume tone used when the scene enters its darker state."
-                ) {
-                    LazyVGrid(
-                        columns: Array(repeating: GridItem(.flexible(minimum: 0), spacing: 10), count: 4),
-                        spacing: 10
-                    ) {
-                        ForEach(ClockLumeColor.allCases) { lume in
-                            LumeChip(
-                                lume: lume,
-                                isSelected: customization.lumeColor == lume
-                            ) {
-                                customization.lumeColor = lume
-                                persist(customization)
-                            }
-                        }
+                    ClockSizeSlider(value: customization.clockScale) { value in
+                        customization.clockScale = value
+                        persist(customization)
                     }
                 }
             }
@@ -134,7 +83,7 @@ public struct ClockStudioPanelView: View {
                 .fill(.ultraThinMaterial)
                 .overlay(
                     RoundedRectangle(cornerRadius: 30, style: .continuous)
-                        .strokeBorder(Color.white.opacity(0.2), lineWidth: 1)
+                        .strokeBorder(Color.white.opacity(0.18), lineWidth: 1)
                 )
         )
         .shadow(color: Color.black.opacity(0.22), radius: 26, x: 0, y: 16)
@@ -151,7 +100,7 @@ private struct StudioHeaderView: View {
                     .font(.system(size: 26, weight: .semibold, design: .rounded))
                     .foregroundStyle(.primary)
 
-                Text("Tune the clock live without leaving the stage.")
+                Text("Tune the clock live without breaking the scene.")
                     .font(.system(size: 13, weight: .medium, design: .rounded))
                     .foregroundStyle(.secondary)
             }
@@ -174,54 +123,62 @@ private struct StudioHeaderView: View {
 }
 
 private struct StudioHeroView: View {
-    let customization: ClockCustomizationStore
     let theme: ClockTheme
+
+    private let previewFrame = ClockClockFrame(
+        digits: [0, 0, 0, 0],
+        poses: DigitGlyph.poses(for: [0, 0, 0, 0])
+    )
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             ZStack {
                 RoundedRectangle(cornerRadius: 24, style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [theme.backgroundTop, theme.backgroundBottom],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
+                    .fill(theme.backgroundColor)
 
-                Circle()
-                    .fill(theme.accentOne.opacity(0.18))
-                    .frame(width: 120, height: 120)
-                    .offset(x: -90, y: -30)
+                LinearGradient(
+                    colors: [
+                        Color.white.opacity(0.08),
+                        Color.clear,
+                        Color.black.opacity(0.1)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
 
-                Rectangle()
-                    .fill(theme.accentThree.opacity(0.16))
-                    .frame(width: 90, height: 90)
-                    .rotationEffect(.degrees(16))
-                    .offset(x: 115, y: 24)
-
-                HStack(spacing: 18) {
-                    ClockFaceView(
-                        pose: .clockUnits(10, 2),
-                        theme: theme,
-                        faceFill: theme.faceFill(for: 0)
-                    )
-                    .frame(width: 92, height: 92)
-
-                    ClockFaceView(
-                        pose: .clockUnits(1, 7),
-                        theme: theme,
-                        faceFill: theme.faceFill(for: 1)
-                    )
-                    .frame(width: 92, height: 92)
-                }
+                ClockPreviewStripView(frame: previewFrame, theme: theme)
+                    .padding(.horizontal, 18)
+                    .padding(.vertical, 22)
             }
-            .frame(height: 170)
+            .frame(height: 176)
 
             HStack(spacing: 8) {
-                SettingBadge(title: customization.hourFormat.title)
-                SettingBadge(title: customization.dialPalette.title)
-                SettingBadge(title: customization.scaleOption.title)
+                SettingBadge(title: "Black Hands")
+                SettingBadge(title: "5 Backgrounds")
+                SettingBadge(title: "Bar-Only")
+            }
+        }
+    }
+}
+
+private struct ClockPreviewStripView: View {
+    let frame: ClockClockFrame
+    let theme: ClockTheme
+
+    var body: some View {
+        GeometryReader { proxy in
+            let layout = ClockDisplayLayout(size: proxy.size, clockScale: 1.04)
+
+            ZStack {
+                ForEach(ClockSlot.all) { slot in
+                    ClockFaceView(
+                        pose: frame.poses[slot.id],
+                        theme: theme
+                    )
+                    .frame(width: layout.cellSize, height: layout.cellSize)
+                    .position(layout.position(for: slot))
+                }
             }
         }
     }
@@ -260,39 +217,6 @@ private struct StudioSectionView<Content: View>: View {
     }
 }
 
-private struct AppearanceCard: View {
-    let mode: ClockAppearanceMode
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            VStack(alignment: .leading, spacing: 12) {
-                Image(systemName: mode.symbolName)
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(isSelected ? Color.white : .primary)
-
-                Spacer()
-
-                Text(mode.title)
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
-                    .foregroundStyle(isSelected ? Color.white : .primary)
-            }
-            .padding(14)
-            .frame(maxWidth: .infinity, minHeight: 88, alignment: .topLeading)
-            .background(
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .fill(isSelected ? Color.black.opacity(0.78) : Color.white.opacity(0.12))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .strokeBorder(isSelected ? Color.white.opacity(0.3) : Color.black.opacity(0.08), lineWidth: 1)
-            )
-        }
-        .buttonStyle(.plain)
-    }
-}
-
 private struct TimeFormatCard: View {
     let format: ClockHourFormat
     let isSelected: Bool
@@ -318,7 +242,7 @@ private struct TimeFormatCard: View {
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .strokeBorder(isSelected ? Color.black.opacity(0.85) : Color.black.opacity(0.08), lineWidth: isSelected ? 2 : 1)
+                    .strokeBorder(isSelected ? Color.black.opacity(0.82) : Color.black.opacity(0.08), lineWidth: isSelected ? 2 : 1)
             )
         }
         .buttonStyle(.plain)
@@ -333,13 +257,9 @@ private struct PaletteCard: View {
     var body: some View {
         Button(action: action) {
             VStack(alignment: .leading, spacing: 10) {
-                HStack(spacing: 6) {
-                    ForEach(palette.previewSwatches.indices, id: \.self) { index in
-                        Circle()
-                            .fill(palette.previewSwatches[index])
-                            .frame(width: 18, height: 18)
-                    }
-                }
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(palette.previewColor)
+                    .frame(height: 52)
 
                 Text(palette.title)
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
@@ -353,91 +273,39 @@ private struct PaletteCard: View {
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .strokeBorder(isSelected ? Color.black.opacity(0.85) : Color.black.opacity(0.08), lineWidth: isSelected ? 2 : 1)
+                    .strokeBorder(isSelected ? Color.black.opacity(0.82) : Color.black.opacity(0.08), lineWidth: isSelected ? 2 : 1)
             )
         }
         .buttonStyle(.plain)
     }
 }
 
-private struct ScaleCard: View {
-    let option: ClockScaleOption
-    let isSelected: Bool
-    let action: () -> Void
+private struct ClockSizeSlider: View {
+    let value: Double
+    let onChange: (Double) -> Void
 
     var body: some View {
-        Button(action: action) {
-            VStack(alignment: .leading, spacing: 12) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .stroke(Color.black.opacity(0.15), lineWidth: 1)
-                        .frame(width: 70, height: 46)
+        VStack(alignment: .leading, spacing: 12) {
+            Slider(
+                value: Binding(
+                    get: { value },
+                    set: { onChange($0) }
+                ),
+                in: ClockCustomizationStore.clockScaleRange
+            )
+            .tint(.black)
 
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .stroke(Color.black.opacity(0.75), lineWidth: 2)
-                        .frame(
-                            width: option == .gallery ? 54 : 40,
-                            height: option == .gallery ? 32 : 22
-                        )
-                }
-
-                Text(option.title)
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+            HStack {
+                Text("Smaller")
+                Spacer()
+                Text("\(Int((value * 100).rounded()))%")
                     .foregroundStyle(.primary)
-
-                Text(option.detail)
-                    .font(.system(size: 11, weight: .medium, design: .rounded))
-                    .foregroundStyle(.secondary)
+                Spacer()
+                Text("Larger")
             }
-            .padding(14)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .fill(Color.white.opacity(isSelected ? 0.18 : 0.08))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .strokeBorder(isSelected ? Color.black.opacity(0.85) : Color.black.opacity(0.08), lineWidth: isSelected ? 2 : 1)
-            )
+            .font(.system(size: 11, weight: .medium, design: .rounded))
+            .foregroundStyle(.secondary)
         }
-        .buttonStyle(.plain)
-    }
-}
-
-private struct LumeChip: View {
-    let lume: ClockLumeColor
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            VStack(spacing: 8) {
-                Circle()
-                    .fill(lume.color)
-                    .frame(width: 24, height: 24)
-                    .overlay(
-                        Circle()
-                            .strokeBorder(Color.white.opacity(0.35), lineWidth: 1)
-                    )
-                    .shadow(color: lume.color.opacity(0.45), radius: 10, x: 0, y: 0)
-
-                Text(lume.title)
-                    .font(.system(size: 10, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-            }
-            .padding(.vertical, 10)
-            .frame(maxWidth: .infinity)
-            .background(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(Color.white.opacity(isSelected ? 0.18 : 0.08))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .strokeBorder(isSelected ? Color.black.opacity(0.85) : Color.black.opacity(0.08), lineWidth: isSelected ? 2 : 1)
-            )
-        }
-        .buttonStyle(.plain)
     }
 }
 
@@ -452,7 +320,7 @@ private struct SettingBadge: View {
             .padding(.vertical, 6)
             .background(
                 Capsule()
-                    .fill(Color.white.opacity(0.38))
+                    .fill(Color.white.opacity(0.36))
             )
     }
 }

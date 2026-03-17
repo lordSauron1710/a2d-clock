@@ -12,12 +12,15 @@
 - Add a ScreenSaver target that reuses `A2DClockCore` // EXECUTED
 - Move host-specific setup behind a shared rendering surface // EXECUTED
 - Package an installable `.saver` // EXECUTED
-- Add a small configuration surface for theme, 12/24-hour mode, and footprint // EXECUTED
+- Add a small configuration surface for background, 12/24-hour mode, and scale // EXECUTED
 
 ## Milestone 3 — Product polish // IN PROGRESS
 
-- Add 16 hand-crafted dial families with day/night palettes // EXECUTED
+- Explore richer palette and dial treatments before converging on the simplified final surface // EXECUTED
 - Tune a single digit-change transition with calm, legible hand choreography // EXECUTED
+- Refine format-toggle choreography and hand readability across state changes // EXECUTED
+- Add readability-aware hand suppression and spring-tuned settling // EXECUTED
+- Simplify the presentation to frameless bar-only digits with scalable sizing // EXECUTED
 - Tune burn-in prevention with longer-term drift, safe repositioning rules, and low-power redraw pacing // EXECUTED
 - Benchmark CPU/GPU use on Retina and external displays
 

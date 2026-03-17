@@ -11,72 +11,76 @@ public enum DigitGlyph {
 
     private static let digits: [Int: [ClockPose]] = [
         0: glyph(
-            topLeft: (6, 3), topRight: (9, 6),
-            middleLeft: (0, 6), middleRight: (0, 6),
-            bottomLeft: (0, 3), bottomRight: (9, 0)
+            topLeft: pose(6, 3), topRight: pose(9, 6),
+            middleLeft: pose(0, 6), middleRight: pose(0, 6),
+            bottomLeft: pose(0, 3), bottomRight: pose(9, 0)
         ),
         1: glyph(
-            topLeft: (7.5, 7.5), topRight: (6, 6),
-            middleLeft: (7.5, 7.5), middleRight: (0, 6),
-            bottomLeft: (7.5, 7.5), bottomRight: (0, 0)
+            topLeft: .blank(), topRight: pose(6, 6),
+            middleLeft: .blank(), middleRight: pose(0, 6),
+            bottomLeft: .blank(), bottomRight: pose(0, 0)
         ),
         2: glyph(
-            topLeft: (3, 3), topRight: (9, 6),
-            middleLeft: (3, 6), middleRight: (0, 9),
-            bottomLeft: (0, 3), bottomRight: (9, 9)
+            topLeft: pose(3, 3), topRight: pose(9, 6),
+            middleLeft: pose(3, 6), middleRight: pose(0, 9),
+            bottomLeft: pose(0, 3), bottomRight: pose(9, 9)
         ),
         3: glyph(
-            topLeft: (3, 3), topRight: (6, 6),
-            middleLeft: (3, 3), middleRight: (0, 6),
-            bottomLeft: (3, 3), bottomRight: (0, 0)
+            topLeft: pose(3, 3), topRight: pose(6, 6),
+            middleLeft: pose(3, 3), middleRight: pose(0, 6),
+            bottomLeft: pose(3, 3), bottomRight: pose(0, 0)
         ),
         4: glyph(
-            topLeft: (6, 3), topRight: (6, 6),
-            middleLeft: (0, 3), middleRight: (0, 6),
-            bottomLeft: (7.5, 7.5), bottomRight: (0, 0)
+            topLeft: pose(6, 3), topRight: pose(6, 6),
+            middleLeft: pose(0, 3), middleRight: pose(0, 6),
+            bottomLeft: .blank(), bottomRight: pose(0, 0)
         ),
         5: glyph(
-            topLeft: (6, 3), topRight: (9, 9),
-            middleLeft: (0, 3), middleRight: (9, 6),
-            bottomLeft: (3, 3), bottomRight: (0, 9)
+            topLeft: pose(6, 3), topRight: pose(9, 9),
+            middleLeft: pose(0, 3), middleRight: pose(9, 6),
+            bottomLeft: pose(3, 3), bottomRight: pose(0, 9)
         ),
         6: glyph(
-            topLeft: (6, 3), topRight: (9, 9),
-            middleLeft: (0, 6), middleRight: (9, 6),
-            bottomLeft: (0, 3), bottomRight: (9, 0)
+            topLeft: pose(6, 3), topRight: pose(9, 9),
+            middleLeft: pose(0, 6), middleRight: pose(9, 6),
+            bottomLeft: pose(0, 3), bottomRight: pose(9, 0)
         ),
         7: glyph(
-            topLeft: (3, 3), topRight: (6, 6),
-            middleLeft: (7.5, 7.5), middleRight: (0, 6),
-            bottomLeft: (7.5, 7.5), bottomRight: (0, 0)
+            topLeft: pose(3, 3), topRight: pose(6, 6),
+            middleLeft: .blank(), middleRight: pose(0, 6),
+            bottomLeft: .blank(), bottomRight: pose(0, 0)
         ),
         8: glyph(
-            topLeft: (6, 3), topRight: (9, 6),
-            middleLeft: (0, 3), middleRight: (9, 6),
-            bottomLeft: (0, 3), bottomRight: (9, 0)
+            topLeft: pose(6, 3), topRight: pose(9, 6),
+            middleLeft: pose(0, 3), middleRight: pose(9, 6),
+            bottomLeft: pose(0, 3), bottomRight: pose(9, 0)
         ),
         9: glyph(
-            topLeft: (6, 3), topRight: (9, 6),
-            middleLeft: (0, 3), middleRight: (0, 6),
-            bottomLeft: (3, 3), bottomRight: (0, 0)
+            topLeft: pose(6, 3), topRight: pose(9, 6),
+            middleLeft: pose(0, 3), middleRight: pose(0, 6),
+            bottomLeft: pose(3, 3), bottomRight: pose(0, 0)
         )
     ]
 
+    private static func pose(_ hour: Double, _ minute: Double) -> ClockPose {
+        .clockUnits(hour, minute)
+    }
+
     private static func glyph(
-        topLeft: (Double, Double),
-        topRight: (Double, Double),
-        middleLeft: (Double, Double),
-        middleRight: (Double, Double),
-        bottomLeft: (Double, Double),
-        bottomRight: (Double, Double)
+        topLeft: ClockPose,
+        topRight: ClockPose,
+        middleLeft: ClockPose,
+        middleRight: ClockPose,
+        bottomLeft: ClockPose,
+        bottomRight: ClockPose
     ) -> [ClockPose] {
         [
-            .clockUnits(topLeft.0, topLeft.1),
-            .clockUnits(topRight.0, topRight.1),
-            .clockUnits(middleLeft.0, middleLeft.1),
-            .clockUnits(middleRight.0, middleRight.1),
-            .clockUnits(bottomLeft.0, bottomLeft.1),
-            .clockUnits(bottomRight.0, bottomRight.1)
+            topLeft,
+            topRight,
+            middleLeft,
+            middleRight,
+            bottomLeft,
+            bottomRight
         ]
     }
 }
