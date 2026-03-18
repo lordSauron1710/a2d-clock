@@ -20,7 +20,7 @@ Six dial palettes (Porcelain, Grove, Saffron, Marina, Blossom, Crimson) each pro
 
 A slide-over panel lets you tune everything live: appearance mode, 12/24-hour format, and dial palette. Changes take effect immediately without restarting the screensaver.
 
-**OLED and XDR safe**
+**Screen Burn-in Protection**
 
 Four-layer burn-in protection designed for Liquid Retina XDR and external OLED displays:
 
