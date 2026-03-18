@@ -9,7 +9,7 @@ final class ClockDisplayLayoutTests: XCTestCase {
             CGSize(width: 1440, height: 900),
             CGSize(width: 2560, height: 1600)
         ]
-        let scaleSamples = [0.86, 1.0, 1.18]
+        let scaleSamples = [0.0, 0.5, 1.0]
 
         for clockScale in scaleSamples {
             for size in sizes {
@@ -19,7 +19,7 @@ final class ClockDisplayLayoutTests: XCTestCase {
                 XCTAssertGreaterThan(layout.contentSize.width, 0)
                 XCTAssertGreaterThan(layout.contentSize.height, 0)
                 XCTAssertLessThanOrEqual(layout.contentSize.width, size.width * 1.03)
-                XCTAssertLessThanOrEqual(layout.contentSize.height, size.height * 0.82)
+                XCTAssertLessThanOrEqual(layout.contentSize.height, size.height * 0.91)
 
                 for slot in ClockSlot.all {
                     let point = layout.position(for: slot)
@@ -34,8 +34,8 @@ final class ClockDisplayLayoutTests: XCTestCase {
 
     func testLargerScaleProducesLargerClock() {
         let size = CGSize(width: 1440, height: 900)
-        let smallerLayout = ClockDisplayLayout(size: size, clockScale: 0.86)
-        let largerLayout = ClockDisplayLayout(size: size, clockScale: 1.18)
+        let smallerLayout = ClockDisplayLayout(size: size, clockScale: 0.0)
+        let largerLayout = ClockDisplayLayout(size: size, clockScale: 1.0)
 
         XCTAssertGreaterThan(largerLayout.cellSize, smallerLayout.cellSize)
         XCTAssertGreaterThan(largerLayout.contentSize.width, smallerLayout.contentSize.width)

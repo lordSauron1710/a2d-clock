@@ -43,16 +43,15 @@ struct ClockDisplayLayout {
     private let logicalMinX = CGFloat(ClockSlot.all.map(\.position.x).min() ?? 0.0)
     private let logicalMinY = CGFloat(ClockSlot.all.map(\.position.y).min() ?? 0.0)
 
-    private var clampedScale: CGFloat {
-        let clampedScale = CGFloat(clockScale.clamped(to: ClockCustomizationStore.clockScaleRange))
-        return clampedScale
+    private var resolvedScale: CGFloat {
+        CGFloat(ClockCustomizationStore.resolvedClockScale(for: clockScale))
     }
 
     var cellSize: CGFloat {
-        let maxScale = CGFloat(ClockCustomizationStore.clockScaleRange.upperBound)
-        let widthLimited = (size.width * 0.985) / (logicalWidth * maxScale)
-        let heightLimited = (size.height * 0.82) / (logicalHeight * maxScale)
-        return min(widthLimited, heightLimited) * clampedScale
+        let maxScale = CGFloat(ClockCustomizationStore.resolvedClockScale(for: ClockCustomizationStore.clockScaleRange.upperBound))
+        let widthLimited = (size.width * 0.99) / (logicalWidth * maxScale)
+        let heightLimited = (size.height * 0.9) / (logicalHeight * maxScale)
+        return min(widthLimited, heightLimited) * resolvedScale
     }
 
     var contentSize: CGSize {

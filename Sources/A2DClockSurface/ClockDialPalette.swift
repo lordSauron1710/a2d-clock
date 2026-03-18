@@ -26,7 +26,7 @@ enum ClockDialPalette: String, CaseIterable, Identifiable {
         }
     }
 
-    var previewColor: Color {
+    var dayBackground: Color {
         switch self {
         case .porcelain:
             return Color(red: 0.92, green: 0.9, blue: 0.86)
@@ -39,5 +39,24 @@ enum ClockDialPalette: String, CaseIterable, Identifiable {
         case .blossom:
             return Color(red: 0.85, green: 0.73, blue: 0.78)
         }
+    }
+
+    var nightLume: Color {
+        switch self {
+        case .porcelain:
+            return Color(red: 0.93, green: 0.96, blue: 1.0)
+        case .grove:
+            return Color(red: 0.66, green: 0.96, blue: 0.78)
+        case .saffron:
+            return Color(red: 1.0, green: 0.84, blue: 0.34)
+        case .marina:
+            return Color(red: 0.48, green: 0.9, blue: 1.0)
+        case .blossom:
+            return Color(red: 0.96, green: 0.72, blue: 0.82)
+        }
+    }
+
+    var previewColor: Color {
+        dayBackground
     }
 }

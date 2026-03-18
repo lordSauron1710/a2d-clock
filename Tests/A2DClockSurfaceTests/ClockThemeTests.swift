@@ -4,12 +4,31 @@ import SwiftUI
 import XCTest
 
 final class ClockThemeTests: XCTestCase {
-    func testThemeUsesSelectedBackgroundAndFixedBlackHands() {
-        for dialPalette in ClockDialPalette.allCases {
-            let theme = ClockTheme.make(palette: dialPalette)
+    func testThemeResolvesDayAndNightRulesAcrossAppearanceModes() {
+        for appearanceMode in ClockAppearanceMode.allCases {
+            for systemColorScheme in [ColorScheme.light, .dark] {
+                for dialPalette in ClockDialPalette.allCases {
+                    let theme = ClockTheme.make(
+                        appearanceMode: appearanceMode,
+                        systemColorScheme: systemColorScheme,
+                        palette: dialPalette
+                    )
+                    let expectedNight = appearanceMode.resolvedColorScheme(
+                        systemColorScheme: systemColorScheme
+                    ) == .dark
 
-            assertColor(theme.backgroundColor, closeTo: dialPalette.previewColor)
-            assertColor(theme.handColor, closeTo: .black)
+                    XCTAssertEqual(theme.isNight, expectedNight)
+
+                    if expectedNight {
+                        assertColor(theme.handColor, closeTo: dialPalette.nightLume)
+                        XCTAssertGreaterThan(rgba(theme.glowColor).alpha, 0.2)
+                    } else {
+                        assertColor(theme.backgroundColor, closeTo: dialPalette.dayBackground)
+                        assertColor(theme.handColor, closeTo: .black)
+                        XCTAssertLessThan(rgba(theme.glowColor).alpha, 0.001)
+                    }
+                }
+            }
         }
     }
 

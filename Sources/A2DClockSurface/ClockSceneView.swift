@@ -2,6 +2,7 @@ import A2DClockCore
 import SwiftUI
 
 public struct ClockSceneView: View {
+    @Environment(\.colorScheme) private var colorScheme
     @State private var frameTransition: ClockFrameTransition?
     @State private var previousHourFormat: ClockHourFormat?
     @State private var transitionSerial = 0
@@ -15,7 +16,11 @@ public struct ClockSceneView: View {
     }
 
     public var body: some View {
-        let theme = ClockTheme.make(palette: customization.dialPalette)
+        let theme = ClockTheme.make(
+            appearanceMode: customization.appearanceMode,
+            systemColorScheme: colorScheme,
+            palette: customization.dialPalette
+        )
         let isTransitionActive = frameTransition?.isActive(at: date) ?? false
 
         TimelineView(.animation(minimumInterval: 1.0 / 30.0, paused: !isTransitionActive)) { context in
@@ -34,7 +39,7 @@ public struct ClockSceneView: View {
                     frame: resolvedFrame,
                     theme: theme,
                     date: renderDate,
-                    clockScale: customization.clockScale
+                    clockScale: ClockCustomizationStore.defaultClockScale
                 )
             }
         }

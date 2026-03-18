@@ -25,3 +25,7 @@
 - Simplified customization to five full-screen background colors with fixed black hands and changed the Studio footprint control into a true continuous size slider
 - Removed the outer frame, per-cell grids, separator dots, soft glow treatment, and center hubs so the clock now reads as frameless bar-only digits on the selected background
 - Tightened kerning, thickened the hands, and changed the transition settle to stay clockwise-only while still ending with a subtle springy feel
+- Restored auto/day/night mode with the same five palette choices serving as day backgrounds and night lume colors
+- Changed the size control to a 0-100 slider while keeping a large-screen visual scale range under the hood
+- Rebuilt the hand renderer so each hand stays a solid rectangle through rotation and both bars overlap cleanly at the pivot without a center gap
+- Renamed the shared day/night style chooser to "Theme" and removed the size control so the clock now stays at a smaller fixed composition scale

@@ -2,6 +2,8 @@ import A2DClockCore
 import SwiftUI
 
 public struct ClockStudioPanelView: View {
+    @Environment(\.colorScheme) private var colorScheme
+
     @Binding private var customization: ClockCustomizationStore
 
     private let persist: (ClockCustomizationStore) -> Void
@@ -18,12 +20,38 @@ public struct ClockStudioPanelView: View {
     }
 
     public var body: some View {
-        let theme = ClockTheme.make(palette: customization.dialPalette)
+        let resolvedScheme = customization.appearanceMode.resolvedColorScheme(systemColorScheme: colorScheme)
+        let theme = ClockTheme.make(
+            appearanceMode: customization.appearanceMode,
+            systemColorScheme: colorScheme,
+            palette: customization.dialPalette
+        )
 
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
                 StudioHeaderView(onClose: onClose)
-                StudioHeroView(theme: theme)
+                StudioHeroView(
+                    theme: theme,
+                    appearanceTitle: customization.appearanceMode.title,
+                    paletteTitle: customization.dialPalette.title
+                )
+
+                StudioSectionView(
+                    title: "Mode",
+                    caption: "Auto follows the system. Day changes the background. Night changes the lume."
+                ) {
+                    HStack(spacing: 10) {
+                        ForEach(ClockAppearanceMode.allCases) { mode in
+                            ModeCard(
+                                mode: mode,
+                                isSelected: customization.appearanceMode == mode
+                            ) {
+                                customization.appearanceMode = mode
+                                persist(customization)
+                            }
+                        }
+                    }
+                }
 
                 StudioSectionView(
                     title: "Time Display",
@@ -43,8 +71,8 @@ public struct ClockStudioPanelView: View {
                 }
 
                 StudioSectionView(
-                    title: "Background",
-                    caption: "Choose one of five simple background colors. The hands stay black."
+                    title: "Theme",
+                    caption: "These same five options drive the day background and the night lume."
                 ) {
                     LazyVGrid(
                         columns: [
@@ -56,6 +84,7 @@ public struct ClockStudioPanelView: View {
                         ForEach(ClockDialPalette.allCases) { palette in
                             PaletteCard(
                                 palette: palette,
+                                isNightPreview: resolvedScheme == .dark,
                                 isSelected: customization.dialPalette == palette
                             ) {
                                 customization.dialPalette = palette
@@ -65,15 +94,6 @@ public struct ClockStudioPanelView: View {
                     }
                 }
 
-                StudioSectionView(
-                    title: "Clock Size",
-                    caption: "Scale the composition continuously from restrained to wall-sized."
-                ) {
-                    ClockSizeSlider(value: customization.clockScale) { value in
-                        customization.clockScale = value
-                        persist(customization)
-                    }
-                }
             }
             .padding(24)
         }
@@ -124,6 +144,8 @@ private struct StudioHeaderView: View {
 
 private struct StudioHeroView: View {
     let theme: ClockTheme
+    let appearanceTitle: String
+    let paletteTitle: String
 
     private let previewFrame = ClockClockFrame(
         digits: [0, 0, 0, 0],
@@ -133,19 +155,8 @@ private struct StudioHeroView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             ZStack {
-                RoundedRectangle(cornerRadius: 24, style: .continuous)
-                    .fill(theme.backgroundColor)
-
-                LinearGradient(
-                    colors: [
-                        Color.white.opacity(0.08),
-                        Color.clear,
-                        Color.black.opacity(0.1)
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                AmbientBackdropView(theme: theme)
+                    .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
 
                 ClockPreviewStripView(frame: previewFrame, theme: theme)
                     .padding(.horizontal, 18)
@@ -154,9 +165,8 @@ private struct StudioHeroView: View {
             .frame(height: 176)
 
             HStack(spacing: 8) {
-                SettingBadge(title: "Black Hands")
-                SettingBadge(title: "5 Backgrounds")
-                SettingBadge(title: "Bar-Only")
+                SettingBadge(title: appearanceTitle)
+                SettingBadge(title: paletteTitle)
             }
         }
     }
@@ -168,7 +178,7 @@ private struct ClockPreviewStripView: View {
 
     var body: some View {
         GeometryReader { proxy in
-            let layout = ClockDisplayLayout(size: proxy.size, clockScale: 1.04)
+            let layout = ClockDisplayLayout(size: proxy.size, clockScale: ClockCustomizationStore.defaultClockScale)
 
             ZStack {
                 ForEach(ClockSlot.all) { slot in
@@ -217,6 +227,38 @@ private struct StudioSectionView<Content: View>: View {
     }
 }
 
+private struct ModeCard: View {
+    let mode: ClockAppearanceMode
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(mode.title)
+                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.primary)
+
+                Text(mode.detail)
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity, minHeight: 82, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .fill(Color.white.opacity(isSelected ? 0.18 : 0.08))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .strokeBorder(isSelected ? Color.black.opacity(0.82) : Color.black.opacity(0.08), lineWidth: isSelected ? 2 : 1)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+}
+
 private struct TimeFormatCard: View {
     let format: ClockHourFormat
     let isSelected: Bool
@@ -251,15 +293,18 @@ private struct TimeFormatCard: View {
 
 private struct PaletteCard: View {
     let palette: ClockDialPalette
+    let isNightPreview: Bool
     let isSelected: Bool
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             VStack(alignment: .leading, spacing: 10) {
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(palette.previewColor)
-                    .frame(height: 52)
+                PalettePreviewSwatch(
+                    palette: palette,
+                    isNightPreview: isNightPreview
+                )
+                .frame(height: 52)
 
                 Text(palette.title)
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
@@ -280,32 +325,52 @@ private struct PaletteCard: View {
     }
 }
 
-private struct ClockSizeSlider: View {
-    let value: Double
-    let onChange: (Double) -> Void
+private struct PalettePreviewSwatch: View {
+    let palette: ClockDialPalette
+    let isNightPreview: Bool
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Slider(
-                value: Binding(
-                    get: { value },
-                    set: { onChange($0) }
-                ),
-                in: ClockCustomizationStore.clockScaleRange
-            )
-            .tint(.black)
+        ZStack {
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(isNightPreview ? Color(red: 0.045, green: 0.05, blue: 0.065) : palette.dayBackground)
 
-            HStack {
-                Text("Smaller")
-                Spacer()
-                Text("\(Int((value * 100).rounded()))%")
-                    .foregroundStyle(.primary)
-                Spacer()
-                Text("Larger")
+            if isNightPreview {
+                HStack(spacing: 14) {
+                    LumePreviewBar(color: palette.nightLume, angle: -.pi / 4.0)
+                    LumePreviewBar(color: palette.nightLume, angle: .pi / 4.0)
+                }
+            } else {
+                LinearGradient(
+                    colors: [
+                        Color.white.opacity(0.08),
+                        Color.clear,
+                        Color.black.opacity(0.08)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             }
-            .font(.system(size: 11, weight: .medium, design: .rounded))
-            .foregroundStyle(.secondary)
         }
+    }
+}
+
+private struct LumePreviewBar: View {
+    let color: Color
+    let angle: Double
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 3, style: .continuous)
+                .fill(color.opacity(0.55))
+                .frame(width: 10, height: 26)
+                .blur(radius: 7)
+
+            RoundedRectangle(cornerRadius: 3, style: .continuous)
+                .fill(color)
+                .frame(width: 10, height: 26)
+        }
+        .rotationEffect(.radians(angle))
     }
 }
 

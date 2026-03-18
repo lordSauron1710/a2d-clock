@@ -14,15 +14,13 @@ final class ClockCustomizationStoreTests: XCTestCase {
             defaults.removePersistentDomain(forName: suiteName)
         }
 
-        let scaleSamples = [0.86, 1.0, 1.18]
-
-        for hourFormat in ClockHourFormat.allCases {
-            for dialPalette in ClockDialPalette.allCases {
-                for clockScale in scaleSamples {
+        for appearanceMode in ClockAppearanceMode.allCases {
+            for hourFormat in ClockHourFormat.allCases {
+                for dialPalette in ClockDialPalette.allCases {
                     var customization = ClockCustomizationStore()
+                    customization.appearanceMode = appearanceMode
                     customization.hourFormat = hourFormat
                     customization.dialPalette = dialPalette
-                    customization.clockScale = clockScale
 
                     customization.persist(defaults: defaults)
 
@@ -35,7 +33,7 @@ final class ClockCustomizationStoreTests: XCTestCase {
         }
     }
 
-    func testLoadSupportsLegacyCompactFootprintFallback() {
+    func testLoadIgnoresLegacyScaleControlsAndUsesFixedDefaultSize() {
         let suiteName = "ClockCustomizationStoreTests.Legacy.\(UUID().uuidString)"
         guard let defaults = UserDefaults(suiteName: suiteName) else {
             XCTFail("Failed to create isolated defaults suite")
@@ -46,9 +44,11 @@ final class ClockCustomizationStoreTests: XCTestCase {
             defaults.removePersistentDomain(forName: suiteName)
         }
 
+        defaults.set(0.94, forKey: "clock.clockSize")
+        defaults.set(1.18, forKey: "clock.clockScale")
         defaults.set("compact", forKey: "clock.scaleOption")
 
         let customization = ClockCustomizationStore.load(defaults: defaults)
-        XCTAssertEqual(customization.clockScale, 0.9, accuracy: 0.0001)
+        XCTAssertEqual(customization.clockScale, ClockCustomizationStore.defaultClockScale, accuracy: 0.0001)
     }
 }

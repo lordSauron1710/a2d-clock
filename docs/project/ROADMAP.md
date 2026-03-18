@@ -21,6 +21,7 @@
 - Refine format-toggle choreography and hand readability across state changes // EXECUTED
 - Add readability-aware hand suppression and spring-tuned settling // EXECUTED
 - Simplify the presentation to frameless bar-only digits with scalable sizing // EXECUTED
+- Restore day/night mode with shared palette customization and refined rectangular hand rendering // EXECUTED
 - Tune burn-in prevention with longer-term drift, safe repositioning rules, and low-power redraw pacing // EXECUTED
 - Benchmark CPU/GPU use on Retina and external displays
 

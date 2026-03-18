@@ -2,6 +2,8 @@ import A2DClockCore
 import SwiftUI
 
 public struct ClockSettingsSheetView: View {
+    @Environment(\.colorScheme) private var colorScheme
+
     @Binding private var customization: ClockCustomizationStore
 
     private let onCancel: () -> Void
@@ -24,7 +26,7 @@ public struct ClockSettingsSheetView: View {
                     Text("A2D Clock")
                         .font(.system(size: 24, weight: .semibold, design: .rounded))
 
-                    Text("Dial in the background, size, and time style before the saver starts.")
+                    Text("Dial in the mode, theme, and time format before the saver starts.")
                         .font(.system(size: 13, weight: .medium, design: .rounded))
                         .foregroundStyle(.secondary)
                 }
@@ -44,6 +46,15 @@ public struct ClockSettingsSheetView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
+                    settingsSection("Mode") {
+                        Picker("Mode", selection: $customization.appearanceMode) {
+                            ForEach(ClockAppearanceMode.allCases) { mode in
+                                Text(mode.title).tag(mode)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                    }
+
                     settingsSection("Time Display") {
                         Picker("Time Display", selection: $customization.hourFormat) {
                             ForEach(ClockHourFormat.allCases) { format in
@@ -53,25 +64,13 @@ public struct ClockSettingsSheetView: View {
                         .pickerStyle(.segmented)
                     }
 
-                    settingsSection("Background") {
-                        Picker("Background", selection: $customization.dialPalette) {
+                    settingsSection("Theme") {
+                        Picker("Style", selection: $customization.dialPalette) {
                             ForEach(ClockDialPalette.allCases) { palette in
                                 Text(palette.title).tag(palette)
                             }
                         }
                         .pickerStyle(.menu)
-                    }
-
-                    settingsSection("Clock Size") {
-                        Slider(
-                            value: $customization.clockScale,
-                            in: ClockCustomizationStore.clockScaleRange
-                        )
-                        .tint(.black)
-
-                        Text("Current size: \(customization.clockScaleLabel)")
-                            .font(.system(size: 11, weight: .medium, design: .rounded))
-                            .foregroundStyle(.secondary)
                     }
                 }
             }

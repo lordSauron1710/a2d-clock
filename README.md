@@ -7,7 +7,7 @@ A native macOS clock screensaver project with a downloadable `.saver` product, a
 Build a native macOS screen-object that feels calm from a distance and satisfying up close:
 
 - a 24-face analog grid that reads as `HHMM` time without separator dots
-- five simple full-screen background colors with fixed black hands
+- auto, day, and night modes that reuse the same five customization options
 - a coordinated whole-board transition that keeps every hand moving clockwise
 - screensaver behavior rather than app behavior: full screen, no chrome, low-power redraw pacing, and slow burn-in drift
 - a rendering core that can be reused inside a real `.saver` bundle
@@ -45,9 +45,9 @@ The repository ships both a development host app and a real `.saver` packaging p
 - full-screen launch behavior
 - 24 analog mini-dials arranged into `HHMM`
 - a slide-over studio panel with live customization controls
+- auto/day/night appearance control
 - 12/24-hour display control
-- five background choices with fixed black hands
-- a continuous clock-size slider
+- five shared theme choices: background in day, lume in night
 - whole-board digit choreography with clockwise-only hand motion
 - adaptive redraw pacing plus slow whole-board drift to reduce retention and battery cost
 - reusable clock layout and digit engine in `A2DClockCore`
