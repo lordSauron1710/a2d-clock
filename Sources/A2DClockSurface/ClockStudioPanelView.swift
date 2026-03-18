@@ -100,6 +100,7 @@ public struct ClockStudioPanelView: View {
                 .padding(24)
             }
             .frame(width: StudioPanelLayout.panelWidth, height: panelHeight, alignment: .top)
+            .clipShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
             .background(
                 RoundedRectangle(cornerRadius: 30, style: .continuous)
                     .fill(.ultraThinMaterial)
@@ -166,48 +167,26 @@ private struct StudioHeroView: View {
     let appearanceTitle: String
     let paletteTitle: String
 
-    private let previewFrame = ClockClockFrame(
-        digits: [0, 0, 0, 0],
-        poses: DigitGlyph.poses(for: [0, 0, 0, 0])
-    )
-
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             ZStack {
                 AmbientBackdropView(theme: theme)
                     .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
 
-                ClockPreviewStripView(frame: previewFrame, theme: theme)
-                    .padding(.horizontal, 18)
-                    .padding(.vertical, 22)
+                HStack(spacing: 20) {
+                    ClockFaceView(pose: .clockUnits(10, 2), theme: theme)
+                        .frame(width: 80, height: 80)
+                    ClockFaceView(pose: .clockUnits(3, 9), theme: theme)
+                        .frame(width: 80, height: 80)
+                    ClockFaceView(pose: .clockUnits(0, 6), theme: theme)
+                        .frame(width: 80, height: 80)
+                }
             }
-            .frame(height: 176)
+            .frame(height: 140)
 
             HStack(spacing: 8) {
                 SettingBadge(title: appearanceTitle)
                 SettingBadge(title: paletteTitle)
-            }
-        }
-    }
-}
-
-private struct ClockPreviewStripView: View {
-    let frame: ClockClockFrame
-    let theme: ClockTheme
-
-    var body: some View {
-        GeometryReader { proxy in
-            let layout = ClockDisplayLayout(size: proxy.size)
-
-            ZStack {
-                ForEach(ClockSlot.all) { slot in
-                    ClockFaceView(
-                        pose: frame.poses[slot.id],
-                        theme: theme
-                    )
-                    .frame(width: layout.cellSize, height: layout.cellSize)
-                    .position(layout.position(for: slot))
-                }
             }
         }
     }
