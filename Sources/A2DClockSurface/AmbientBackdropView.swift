@@ -2,6 +2,7 @@ import SwiftUI
 
 struct AmbientBackdropView: View {
     let theme: ClockTheme
+    var driftCenter: UnitPoint = .center
 
     var body: some View {
         GeometryReader { proxy in
@@ -24,7 +25,7 @@ struct AmbientBackdropView: View {
                             theme.ambientTint,
                             Color.clear
                         ],
-                        center: .center,
+                        center: driftCenter,
                         startRadius: 0,
                         endRadius: max(proxy.size.width, proxy.size.height) * 0.34
                     )
@@ -34,7 +35,7 @@ struct AmbientBackdropView: View {
                             Color.clear,
                             Color.black.opacity(0.24)
                         ],
-                        center: .center,
+                        center: driftCenter,
                         startRadius: 0,
                         endRadius: max(proxy.size.width, proxy.size.height) * 0.74
                     )
@@ -54,7 +55,7 @@ struct AmbientBackdropView: View {
                             Color.clear,
                             Color.black.opacity(0.12)
                         ],
-                        center: .center,
+                        center: driftCenter,
                         startRadius: 0,
                         endRadius: max(proxy.size.width, proxy.size.height) * 0.7
                     )

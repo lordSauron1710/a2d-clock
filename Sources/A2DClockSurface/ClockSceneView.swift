@@ -32,15 +32,18 @@ public struct ClockSceneView: View {
                 at: renderDate,
                 engine: engine
             )
+            let burnInLuminance = ClockBurnInStrategy.luminance(for: renderDate)
+            let backdropCenter = ClockBurnInStrategy.backdropCenter(for: renderDate)
 
             ZStack {
-                AmbientBackdropView(theme: theme)
+                AmbientBackdropView(theme: theme, driftCenter: backdropCenter)
                 ClockDisplayView(
                     frame: resolvedFrame,
                     theme: theme,
                     date: renderDate
                 )
             }
+            .overlay(Color.black.opacity(1.0 - burnInLuminance))
         }
         .ignoresSafeArea()
         .task(id: transitionSerial) {
