@@ -4,10 +4,7 @@ A native macOS clock screensaver. 24 analog mini-dials arranged into `HHMM` — 
 
 ---
 
-<!-- Drop screenshots into docs/screenshots/ and uncomment these lines -->
-<!-- ![Day mode](docs/screenshots/day.png) -->
-<!-- ![Night mode](docs/screenshots/night.png) -->
-<!-- ![Studio panel](docs/screenshots/studio.png) -->
+![Transition: day 12h → night 24h](docs/screenshots/transition.gif)
 
 ---
 
