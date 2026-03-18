@@ -20,93 +20,110 @@ public struct ClockStudioPanelView: View {
     }
 
     public var body: some View {
-        let resolvedScheme = customization.appearanceMode.resolvedColorScheme(systemColorScheme: colorScheme)
-        let theme = ClockTheme.make(
-            appearanceMode: customization.appearanceMode,
-            systemColorScheme: colorScheme,
-            palette: customization.dialPalette
-        )
+        GeometryReader { proxy in
+            let resolvedScheme = customization.appearanceMode.resolvedColorScheme(systemColorScheme: colorScheme)
+            let theme = ClockTheme.make(
+                appearanceMode: customization.appearanceMode,
+                systemColorScheme: colorScheme,
+                palette: customization.dialPalette
+            )
+            let panelHeight = StudioPanelLayout.panelHeight(containerHeight: proxy.size.height)
 
-        ScrollView {
-            VStack(alignment: .leading, spacing: 22) {
-                StudioHeaderView(onClose: onClose)
-                StudioHeroView(
-                    theme: theme,
-                    appearanceTitle: customization.appearanceMode.title,
-                    paletteTitle: customization.dialPalette.title
-                )
+            ScrollView(.vertical) {
+                VStack(alignment: .leading, spacing: 22) {
+                    StudioHeaderView(onClose: onClose)
+                    StudioHeroView(
+                        theme: theme,
+                        appearanceTitle: customization.appearanceMode.title,
+                        paletteTitle: customization.dialPalette.title
+                    )
 
-                StudioSectionView(
-                    title: "Mode",
-                    caption: "Auto follows the system. Day changes the background. Night changes the lume."
-                ) {
-                    HStack(spacing: 10) {
-                        ForEach(ClockAppearanceMode.allCases) { mode in
-                            ModeCard(
-                                mode: mode,
-                                isSelected: customization.appearanceMode == mode
-                            ) {
-                                customization.appearanceMode = mode
-                                persist(customization)
-                            }
-                        }
-                    }
-                }
-
-                StudioSectionView(
-                    title: "Time Display",
-                    caption: "Switch between 12-hour and 24-hour time while the entire clock transitions together."
-                ) {
-                    HStack(spacing: 10) {
-                        ForEach(ClockHourFormat.allCases) { format in
-                            TimeFormatCard(
-                                format: format,
-                                isSelected: customization.hourFormat == format
-                            ) {
-                                customization.hourFormat = format
-                                persist(customization)
-                            }
-                        }
-                    }
-                }
-
-                StudioSectionView(
-                    title: "Theme",
-                    caption: "These same five options drive the day background and the night lume."
-                ) {
-                    LazyVGrid(
-                        columns: [
-                            GridItem(.flexible(minimum: 0), spacing: 12),
-                            GridItem(.flexible(minimum: 0), spacing: 12)
-                        ],
-                        spacing: 12
+                    StudioSectionView(
+                        title: "Mode",
+                        caption: "Auto follows the system. Day changes the background. Night changes the lume."
                     ) {
-                        ForEach(ClockDialPalette.allCases) { palette in
-                            PaletteCard(
-                                palette: palette,
-                                isNightPreview: resolvedScheme == .dark,
-                                isSelected: customization.dialPalette == palette
-                            ) {
-                                customization.dialPalette = palette
-                                persist(customization)
+                        HStack(spacing: 10) {
+                            ForEach(ClockAppearanceMode.allCases) { mode in
+                                ModeCard(
+                                    mode: mode,
+                                    isSelected: customization.appearanceMode == mode
+                                ) {
+                                    customization.appearanceMode = mode
+                                    persist(customization)
+                                }
+                            }
+                        }
+                    }
+
+                    StudioSectionView(
+                        title: "Time Display",
+                        caption: "Switch between 12-hour and 24-hour time while the entire clock transitions together."
+                    ) {
+                        HStack(spacing: 10) {
+                            ForEach(ClockHourFormat.allCases) { format in
+                                TimeFormatCard(
+                                    format: format,
+                                    isSelected: customization.hourFormat == format
+                                ) {
+                                    customization.hourFormat = format
+                                    persist(customization)
+                                }
+                            }
+                        }
+                    }
+
+                    StudioSectionView(
+                        title: "Theme",
+                        caption: "These same five options drive the day background and the night lume."
+                    ) {
+                        LazyVGrid(
+                            columns: [
+                                GridItem(.flexible(minimum: 0), spacing: 12),
+                                GridItem(.flexible(minimum: 0), spacing: 12)
+                            ],
+                            spacing: 12
+                        ) {
+                            ForEach(ClockDialPalette.allCases) { palette in
+                                PaletteCard(
+                                    palette: palette,
+                                    isNightPreview: resolvedScheme == .dark,
+                                    isSelected: customization.dialPalette == palette
+                                ) {
+                                    customization.dialPalette = palette
+                                    persist(customization)
+                                }
                             }
                         }
                     }
                 }
-
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(24)
             }
-            .padding(24)
+            .frame(width: StudioPanelLayout.panelWidth, height: panelHeight, alignment: .top)
+            .background(
+                RoundedRectangle(cornerRadius: 30, style: .continuous)
+                    .fill(.ultraThinMaterial)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 30, style: .continuous)
+                            .strokeBorder(Color.white.opacity(0.18), lineWidth: 1)
+                    )
+            )
+            .shadow(color: Color.black.opacity(0.22), radius: 26, x: 0, y: 16)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+            .padding(.top, StudioPanelLayout.outerMargin)
+            .padding(.trailing, StudioPanelLayout.outerMargin)
         }
-        .frame(width: 380)
-        .background(
-            RoundedRectangle(cornerRadius: 30, style: .continuous)
-                .fill(.ultraThinMaterial)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 30, style: .continuous)
-                        .strokeBorder(Color.white.opacity(0.18), lineWidth: 1)
-                )
-        )
-        .shadow(color: Color.black.opacity(0.22), radius: 26, x: 0, y: 16)
+    }
+}
+
+enum StudioPanelLayout {
+    static let panelWidth: CGFloat = 380
+    static let preferredHeight: CGFloat = 680
+    static let outerMargin: CGFloat = 28
+
+    static func panelHeight(containerHeight: CGFloat) -> CGFloat {
+        let availableHeight = max(containerHeight - (outerMargin * 2), 0)
+        return min(availableHeight, preferredHeight)
     }
 }
 

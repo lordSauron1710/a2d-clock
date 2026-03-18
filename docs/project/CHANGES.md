@@ -2,6 +2,8 @@
 
 ## 2026-03-17
 
+- Fixed the Studio panel so its scroll viewport stays height-bounded and scrollable inside the full-screen host
+- Recentered the clock hands at each pivot, added a small junction overlap, and extended their reach so adjacent digit bars meet cleanly without rendering seams
 - Scaffolded `a2d-clock` as a native macOS Swift package
 - Added `A2DClockCore` for digit glyphs, layout metadata, and transition timing
 - Built a full-screen screensaver-style prototype with 24 analog mini-dials

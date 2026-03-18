@@ -23,6 +23,7 @@
 - Simplify the presentation to frameless bar-only digits with scalable sizing // EXECUTED
 - Restore day/night mode with shared palette customization and refined rectangular hand rendering // EXECUTED
 - Tune burn-in prevention with longer-term drift, safe repositioning rules, and low-power redraw pacing // EXECUTED
+- Fix Studio panel scrolling and restore centered hand junction overlap with seam-free digit bars // EXECUTED
 - Benchmark CPU/GPU use on Retina and external displays
 
 ## Milestone 4 — Distribution
