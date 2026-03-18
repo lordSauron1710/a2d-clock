@@ -6,6 +6,7 @@ enum ClockDialPalette: String, CaseIterable, Identifiable {
     case saffron
     case marina
     case blossom
+    case crimson
 
     var id: String {
         rawValue
@@ -23,6 +24,8 @@ enum ClockDialPalette: String, CaseIterable, Identifiable {
             return "Marina"
         case .blossom:
             return "Blossom"
+        case .crimson:
+            return "Crimson"
         }
     }
 
@@ -38,6 +41,8 @@ enum ClockDialPalette: String, CaseIterable, Identifiable {
             return Color(red: 0.71, green: 0.8, blue: 0.88)
         case .blossom:
             return Color(red: 0.85, green: 0.73, blue: 0.78)
+        case .crimson:
+            return Color(red: 0.88, green: 0.62, blue: 0.62)
         }
     }
 
@@ -53,6 +58,8 @@ enum ClockDialPalette: String, CaseIterable, Identifiable {
             return Color(red: 0.48, green: 0.9, blue: 1.0)
         case .blossom:
             return Color(red: 0.96, green: 0.72, blue: 0.82)
+        case .crimson:
+            return Color(red: 1.0, green: 0.36, blue: 0.36)
         }
     }
 
