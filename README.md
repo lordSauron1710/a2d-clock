@@ -56,64 +56,28 @@ docs/
 
 ## Install
 
-### Download (no build required)
+**Homebrew:**
+```sh
+brew install --cask --no-quarantine lordSauron1710/tap/a2d-clock
+```
 
-1. Grab `A2DClock.zip` from the [latest release](../../releases/latest) and unzip it
+**Manual:**
+1. Download `A2DClock.zip` from the [latest release](../../releases/latest) and unzip it
 2. Drag **A2DClock.app** to your Applications folder
 3. Launch **A2DClock** once — it installs the screensaver automatically
 4. Open **System Settings → Screen Saver → Other → A2D Clock**
 
-**If macOS blocks the app on first launch**, run this in Terminal then try again:
-
-```bash
+**If macOS blocks the app:**
+```sh
 xattr -d com.apple.quarantine /Applications/A2DClock.app
 ```
-
-On macOS Sequoia: go to **System Settings → Privacy & Security** → **Open Anyway**.
+Or on Sequoia: **System Settings → Privacy & Security → Open Anyway**.
 
 ---
 
-## Prerequisites (for building from source)
+## Requirements
 
 - macOS 13 or later
-- Swift 6.1+
-
-## Run the development app
-
-```bash
-swift run A2DClock
-```
-
-Or open the package in Xcode and run the `A2DClock` target directly.
-
-## Build and install the screensaver
-
-```bash
-make install
-```
-
-Builds everything and installs `A2DClock.saver` into `~/Library/Screen Savers` (no admin required).
-
-Other targets:
-
-| Command | What it does |
-|---|---|
-| `make saver` | Build `dist/A2DClock.saver` only |
-| `make app` | Build `dist/A2DClock.app` (with screensaver embedded) |
-| `make install` | Build and install screensaver locally for testing |
-| `make release` | Package `dist/A2DClock.zip` for distribution |
-| `make clean` | Remove all build artifacts |
-
-## Tests
-
-```bash
-swift test
-```
-
-## Documentation
-
-- [docs/project/README.md](docs/project/README.md) — project intent and direction
-- [docs/policies/POLICY_INDEX.md](docs/policies/POLICY_INDEX.md) — repo policies
 ## 💰 Buy Me A Coffee
 
 [![BuyMeACoffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/sandeepvangara)
