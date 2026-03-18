@@ -89,6 +89,5 @@ swift test
 
 ## Documentation
 
-- [AGENTS.md](AGENTS.md) — working rules for agent sessions
 - [docs/project/README.md](docs/project/README.md) — project intent and direction
 - [docs/policies/POLICY_INDEX.md](docs/policies/POLICY_INDEX.md) — repo policies
