@@ -11,8 +11,8 @@ export const RemotionRoot: React.FC = () => {
       component={Showcase}
       durationInFrames={650}
       fps={50}
-      width={800}
-      height={300}
+      width={600}
+      height={225}
     />
   );
 };

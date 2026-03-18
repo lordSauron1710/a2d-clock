@@ -79,7 +79,10 @@ export const Showcase: React.FC = () => {
   return (
     <AbsoluteFill style={{ overflow: "hidden" }}>
       <Backdrop width={width} height={height} themeProgress={themeProgress} />
-      <ClockGrid frame={clockFrame} theme={theme} width={width} height={height} />
+      {/* AbsoluteFill ensures the SVG stacks above the backdrop (positioned > static in paint order) */}
+      <AbsoluteFill>
+        <ClockGrid frame={clockFrame} theme={theme} width={width} height={height} />
+      </AbsoluteFill>
     </AbsoluteFill>
   );
 };
