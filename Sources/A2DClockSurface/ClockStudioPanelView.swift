@@ -116,10 +116,12 @@ public struct ClockStudioPanelView: View {
     }
 }
 
-enum StudioPanelLayout {
+public enum StudioPanelLayout {
     static let panelWidth: CGFloat = 380
     static let preferredHeight: CGFloat = 680
     static let outerMargin: CGFloat = 28
+    static var visibleFootprintWidth: CGFloat { panelWidth + outerMargin }
+    public static let hostReservedWidth: CGFloat = 420
 
     static func panelHeight(containerHeight: CGFloat) -> CGFloat {
         let availableHeight = max(containerHeight - (outerMargin * 2), 0)

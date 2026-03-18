@@ -10,7 +10,7 @@ struct ScreensaverHostView: View {
     var body: some View {
         ZStack(alignment: .topTrailing) {
             ClockSceneView(date: currentDate, customization: customization)
-                .padding(.trailing, isStudioPresented ? 420 : 0)
+                .padding(.trailing, isStudioPresented ? StudioPanelLayout.hostReservedWidth : 0)
                 .animation(.spring(response: 0.45, dampingFraction: 0.86), value: isStudioPresented)
 
             if isStudioPresented {
@@ -22,8 +22,6 @@ struct ScreensaverHostView: View {
                     },
                     onClose: { isStudioPresented = false }
                 )
-                .padding(.top, 28)
-                .padding(.trailing, 28)
                 .transition(.move(edge: .trailing).combined(with: .opacity))
             } else {
                 Button {

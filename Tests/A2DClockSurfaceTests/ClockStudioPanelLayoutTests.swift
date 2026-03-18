@@ -21,4 +21,11 @@ final class ClockStudioPanelLayoutTests: XCTestCase {
             accuracy: 0.0001
         )
     }
+
+    func testVisiblePanelFootprintFitsInsideTheReservedHostRail() {
+        XCTAssertLessThanOrEqual(
+            StudioPanelLayout.visibleFootprintWidth,
+            StudioPanelLayout.hostReservedWidth
+        )
+    }
 }
