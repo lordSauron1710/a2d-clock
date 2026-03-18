@@ -29,8 +29,6 @@ docs/
   project/              Project-level notes and direction
   screenshots/          Placeholder for future captures and demo stills
 AGENTS.md               Working rules for future agent sessions
-docs/project/ROADMAP.md Milestones and packaging path
-docs/project/CHANGES.md Lightweight timeline of repo work
 ```
 
 ## Prerequisites
@@ -88,16 +86,12 @@ swift test
 ## Documentation map
 
 - [AGENTS.md](AGENTS.md)
-- [docs/project/ROADMAP.md](docs/project/ROADMAP.md)
-- [docs/project/CHANGES.md](docs/project/CHANGES.md)
 - [docs/project/README.md](docs/project/README.md)
 - [docs/policies/POLICY_INDEX.md](docs/policies/POLICY_INDEX.md)
 
 ## Screensaver Path
 
 The final product is the installable `.saver` bundle. The host app remains useful for development, but release packaging should flow through the saver artifact and the local install script above.
-
-See [docs/project/ROADMAP.md](docs/project/ROADMAP.md) for the packaging plan and product milestones.
 
 ## Attribution
 

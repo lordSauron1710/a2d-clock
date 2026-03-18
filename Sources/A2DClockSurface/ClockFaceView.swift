@@ -1,30 +1,11 @@
 import A2DClockCore
 import SwiftUI
 
-enum ClockHandPlacement: Equatable {
-    case centered
-    case leading
-    case trailing
-}
-
 struct ClockHandGeometry {
     private static let seamOverlapMultiplier: CGFloat = 1.02
     private static let junctionOverlapMultiplier: CGFloat = 0.35
     private static let visibilityThreshold = 0.001
     private static let coincidentThreshold = 0.02
-
-    static func placements(
-        hourAngle: Double,
-        minuteAngle: Double,
-        hourVisible: Bool,
-        minuteVisible: Bool
-    ) -> (hour: ClockHandPlacement, minute: ClockHandPlacement) {
-        guard hourVisible || minuteVisible else {
-            return (.centered, .centered)
-        }
-
-        return (.centered, .centered)
-    }
 
     static func handReach(for faceRadius: CGFloat) -> CGFloat {
         faceRadius * seamOverlapMultiplier
@@ -51,8 +32,7 @@ struct ClockHandGeometry {
         center: CGPoint,
         angle: Double,
         radius: CGFloat,
-        lineWidth: CGFloat,
-        placement: ClockHandPlacement
+        lineWidth: CGFloat
     ) -> Path {
         let direction = CGPoint(x: sin(angle), y: -cos(angle))
         let startPoint = CGPoint(
@@ -63,33 +43,13 @@ struct ClockHandGeometry {
             x: center.x + (direction.x * radius),
             y: center.y + (direction.y * radius)
         )
-
-        switch placement {
-        case .centered:
-            let offset = trailingNormal(for: direction, magnitude: lineWidth * 0.5)
-            return quadrilateralPath(
-                a: CGPoint(x: startPoint.x - offset.x, y: startPoint.y - offset.y),
-                b: CGPoint(x: startPoint.x + offset.x, y: startPoint.y + offset.y),
-                c: CGPoint(x: endPoint.x + offset.x, y: endPoint.y + offset.y),
-                d: CGPoint(x: endPoint.x - offset.x, y: endPoint.y - offset.y)
-            )
-        case .leading:
-            let offset = leadingNormal(for: direction, magnitude: lineWidth)
-            return quadrilateralPath(
-                a: startPoint,
-                b: CGPoint(x: startPoint.x + offset.x, y: startPoint.y + offset.y),
-                c: CGPoint(x: endPoint.x + offset.x, y: endPoint.y + offset.y),
-                d: endPoint
-            )
-        case .trailing:
-            let offset = trailingNormal(for: direction, magnitude: lineWidth)
-            return quadrilateralPath(
-                a: startPoint,
-                b: CGPoint(x: startPoint.x + offset.x, y: startPoint.y + offset.y),
-                c: CGPoint(x: endPoint.x + offset.x, y: endPoint.y + offset.y),
-                d: endPoint
-            )
-        }
+        let offset = trailingNormal(for: direction, magnitude: lineWidth * 0.5)
+        return quadrilateralPath(
+            a: CGPoint(x: startPoint.x - offset.x, y: startPoint.y - offset.y),
+            b: CGPoint(x: startPoint.x + offset.x, y: startPoint.y + offset.y),
+            c: CGPoint(x: endPoint.x + offset.x, y: endPoint.y + offset.y),
+            d: CGPoint(x: endPoint.x - offset.x, y: endPoint.y - offset.y)
+        )
     }
 
     private static func quadrilateralPath(
@@ -105,13 +65,6 @@ struct ClockHandGeometry {
         path.addLine(to: d)
         path.closeSubpath()
         return path
-    }
-
-    private static func leadingNormal(for direction: CGPoint, magnitude: CGFloat) -> CGPoint {
-        CGPoint(
-            x: direction.y * magnitude,
-            y: -direction.x * magnitude
-        )
     }
 
     private static func trailingNormal(for direction: CGPoint, magnitude: CGFloat) -> CGPoint {
@@ -152,12 +105,6 @@ struct ClockFaceView: View {
             let center = CGPoint(x: size.width / 2.0, y: size.height / 2.0)
             let lineWidth = faceRadius * 0.2
             let handReach = ClockHandGeometry.handReach(for: faceRadius)
-            let placements = ClockHandGeometry.placements(
-                hourAngle: pose.hourAngle,
-                minuteAngle: pose.minuteAngle,
-                hourVisible: pose.hourOpacity > 0.001,
-                minuteVisible: pose.minuteOpacity > 0.001
-            )
             let coincidentOpacity = ClockHandGeometry.coincidentOpacity(
                 hourAngle: pose.hourAngle,
                 minuteAngle: pose.minuteAngle,
@@ -171,8 +118,7 @@ struct ClockFaceView: View {
                     center: center,
                     angle: pose.hourAngle,
                     radius: handReach,
-                    lineWidth: lineWidth,
-                    placement: placements.hour
+                    lineWidth: lineWidth
                 ),
                 color: theme.handColor,
                 glowColor: theme.glowColor,
@@ -186,8 +132,7 @@ struct ClockFaceView: View {
                         center: center,
                         angle: pose.minuteAngle,
                         radius: handReach,
-                        lineWidth: lineWidth,
-                        placement: placements.minute
+                        lineWidth: lineWidth
                     ),
                     color: theme.handColor,
                     glowColor: theme.glowColor,

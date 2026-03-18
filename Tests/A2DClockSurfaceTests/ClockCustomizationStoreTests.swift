@@ -32,23 +32,4 @@ final class ClockCustomizationStoreTests: XCTestCase {
             }
         }
     }
-
-    func testLoadIgnoresLegacyScaleControlsAndUsesFixedDefaultSize() {
-        let suiteName = "ClockCustomizationStoreTests.Legacy.\(UUID().uuidString)"
-        guard let defaults = UserDefaults(suiteName: suiteName) else {
-            XCTFail("Failed to create isolated defaults suite")
-            return
-        }
-
-        defer {
-            defaults.removePersistentDomain(forName: suiteName)
-        }
-
-        defaults.set(0.94, forKey: "clock.clockSize")
-        defaults.set(1.18, forKey: "clock.clockScale")
-        defaults.set("compact", forKey: "clock.scaleOption")
-
-        let customization = ClockCustomizationStore.load(defaults: defaults)
-        XCTAssertEqual(customization.clockScale, ClockCustomizationStore.defaultClockScale, accuracy: 0.0001)
-    }
 }

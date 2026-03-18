@@ -4,54 +4,6 @@ import SwiftUI
 import XCTest
 
 final class ClockHandGeometryTests: XCTestCase {
-    func testOrthogonalHandsStayCenteredForClockLikeJunctionOverlap() {
-        let placements = ClockHandGeometry.placements(
-            hourAngle: ClockPose.radians(forClockUnits: 9),
-            minuteAngle: ClockPose.radians(forClockUnits: 6),
-            hourVisible: true,
-            minuteVisible: true
-        )
-
-        XCTAssertEqual(placements.hour, ClockHandPlacement.centered)
-        XCTAssertEqual(placements.minute, ClockHandPlacement.centered)
-    }
-
-    func testReversedOrthogonalHandsAlsoStayCentered() {
-        let placements = ClockHandGeometry.placements(
-            hourAngle: ClockPose.radians(forClockUnits: 6),
-            minuteAngle: ClockPose.radians(forClockUnits: 9),
-            hourVisible: true,
-            minuteVisible: true
-        )
-
-        XCTAssertEqual(placements.hour, ClockHandPlacement.centered)
-        XCTAssertEqual(placements.minute, ClockHandPlacement.centered)
-    }
-
-    func testStraightHandsStayCentered() {
-        let placements = ClockHandGeometry.placements(
-            hourAngle: ClockPose.radians(forClockUnits: 0),
-            minuteAngle: ClockPose.radians(forClockUnits: 6),
-            hourVisible: true,
-            minuteVisible: true
-        )
-
-        XCTAssertEqual(placements.hour, ClockHandPlacement.centered)
-        XCTAssertEqual(placements.minute, ClockHandPlacement.centered)
-    }
-
-    func testSingleVisibleHandStaysCentered() {
-        let placements = ClockHandGeometry.placements(
-            hourAngle: ClockPose.radians(forClockUnits: 3),
-            minuteAngle: ClockPose.radians(forClockUnits: 9),
-            hourVisible: true,
-            minuteVisible: false
-        )
-
-        XCTAssertEqual(placements.hour, ClockHandPlacement.centered)
-        XCTAssertEqual(placements.minute, ClockHandPlacement.centered)
-    }
-
     func testCoincidentHandsCombineIntoSingleVisibleOpacity() {
         let opacity = ClockHandGeometry.coincidentOpacity(
             hourAngle: ClockPose.radians(forClockUnits: 3),
@@ -83,15 +35,13 @@ final class ClockHandGeometryTests: XCTestCase {
             center: center,
             angle: ClockPose.radians(forClockUnits: 3),
             radius: reach,
-            lineWidth: lineWidth,
-            placement: .centered
+            lineWidth: lineWidth
         )
         let vertical = ClockHandGeometry.path(
             center: center,
             angle: ClockPose.radians(forClockUnits: 6),
             radius: reach,
-            lineWidth: lineWidth,
-            placement: .centered
+            lineWidth: lineWidth
         )
         let junctionProbe = CGPoint(x: 52, y: 52)
 
@@ -105,8 +55,7 @@ final class ClockHandGeometryTests: XCTestCase {
             center: center,
             angle: ClockPose.radians(forClockUnits: 3),
             radius: ClockHandGeometry.handReach(for: 50),
-            lineWidth: 10,
-            placement: .centered
+            lineWidth: 10
         )
 
         XCTAssertGreaterThan(path.boundingRect.maxX, 100)

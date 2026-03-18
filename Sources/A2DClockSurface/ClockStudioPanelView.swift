@@ -197,7 +197,7 @@ private struct ClockPreviewStripView: View {
 
     var body: some View {
         GeometryReader { proxy in
-            let layout = ClockDisplayLayout(size: proxy.size, clockScale: ClockCustomizationStore.defaultClockScale)
+            let layout = ClockDisplayLayout(size: proxy.size)
 
             ZStack {
                 ForEach(ClockSlot.all) { slot in

@@ -38,8 +38,7 @@ public struct ClockSceneView: View {
                 ClockDisplayView(
                     frame: resolvedFrame,
                     theme: theme,
-                    date: renderDate,
-                    clockScale: ClockCustomizationStore.defaultClockScale
+                    date: renderDate
                 )
             }
         }

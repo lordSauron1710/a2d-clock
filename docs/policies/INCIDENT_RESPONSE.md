@@ -12,4 +12,3 @@ Response order:
 1. reproduce locally
 2. reduce the issue to the rendering core or host layer
 3. patch and add a regression test or documented manual check
-4. update `docs/project/CHANGES.md` when the fix lands
