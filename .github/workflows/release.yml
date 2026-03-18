@@ -8,6 +8,8 @@ on:
 jobs:
   build-and-release:
     runs-on: macos-latest
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@v4
@@ -21,6 +23,10 @@ jobs:
       - name: Package
         run: make release
 
+      - name: Compute SHA256
+        id: sha
+        run: echo "sha256=$(shasum -a 256 dist/A2DClock.zip | awk '{print $1}')" >> "$GITHUB_OUTPUT"
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -28,10 +34,16 @@ jobs:
           body: |
             ## Install
 
+            **Homebrew (recommended):**
+            ```sh
+            brew install --cask --no-quarantine lordSauron1710/tap/a2d-clock
+            ```
+
+            **Manual:**
             1. Download `A2DClock.zip` and unzip it
             2. Drag `A2DClock.app` to your Applications folder
             3. Launch **A2DClock** once — it will install the screensaver automatically
-            4. Open **System Settings → Screen Saver** and select **A2D Clock**
+            4. Open **System Settings → Screen Saver → Other → A2D Clock**
 
             ### If macOS blocks the app on first launch
 
@@ -41,3 +53,20 @@ jobs:
             ```
 
             Or go to **System Settings → Privacy & Security** and click **Open Anyway**.
+
+      - name: Update Homebrew tap
+        env:
+          TAP_TOKEN: ${{ secrets.TAP_TOKEN }}
+          VERSION: ${{ github.ref_name }}
+          SHA256: ${{ steps.sha.outputs.sha256 }}
+        run: |
+          VERSION="${VERSION#v}"
+          git clone "https://x-access-token:${TAP_TOKEN}@github.com/lordSauron1710/homebrew-tap.git" tap
+          cd tap
+          sed -i '' "s/version \".*\"/version \"${VERSION}\"/" Casks/a2d-clock.rb
+          sed -i '' "s/sha256 \".*\"/sha256 \"${SHA256}\"/" Casks/a2d-clock.rb
+          git config user.email "actions@github.com"
+          git config user.name "github-actions"
+          git add Casks/a2d-clock.rb
+          git diff --cached --quiet || git commit -m "Update a2d-clock to ${VERSION}"
+          git push
