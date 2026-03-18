@@ -1,8 +1,12 @@
 import A2DClockSurface
+import ScreenSaver
 import SwiftUI
 
 struct ScreensaverHostView: View {
-    @State private var customization = ClockCustomizationStore.load()
+    private static let saverDefaults: UserDefaults =
+        ScreenSaverDefaults(forModuleWithName: "com.sandy.a2dclock.saver") ?? .standard
+
+    @State private var customization = ClockCustomizationStore.load(defaults: saverDefaults)
     @State private var currentDate = Date()
     @State private var isStudioPresented = false
     @State private var renderGeneration = 0
@@ -17,7 +21,7 @@ struct ScreensaverHostView: View {
                 ClockStudioPanelView(
                     customization: $customization,
                     persist: {
-                        $0.persist()
+                        $0.persist(defaults: Self.saverDefaults)
                         renderGeneration += 1
                     },
                     onClose: { isStudioPresented = false }

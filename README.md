@@ -54,7 +54,26 @@ docs/
   project/              Project-level notes
 ```
 
-## Prerequisites
+## Install
+
+### Download (no build required)
+
+1. Grab `A2DClock.zip` from the [latest release](../../releases/latest) and unzip it
+2. Drag **A2DClock.app** to your Applications folder
+3. Launch **A2DClock** once — it installs the screensaver automatically
+4. Open **System Settings → Screen Saver → Other → A2D Clock**
+
+**If macOS blocks the app on first launch**, run this in Terminal then try again:
+
+```bash
+xattr -d com.apple.quarantine /Applications/A2DClock.app
+```
+
+On macOS Sequoia: go to **System Settings → Privacy & Security** → **Open Anyway**.
+
+---
+
+## Prerequisites (for building from source)
 
 - macOS 13 or later
 - Swift 6.1+
@@ -70,16 +89,20 @@ Or open the package in Xcode and run the `A2DClock` target directly.
 ## Build and install the screensaver
 
 ```bash
-./scripts/build-saver.sh
+make install
 ```
 
-Produces `dist/A2DClock.saver` and `dist/A2DClock.zip`. To install into the current user account only (no admin required):
+Builds everything and installs `A2DClock.saver` into `~/Library/Screen Savers` (no admin required).
 
-```bash
-./scripts/install-saver.sh
-```
+Other targets:
 
-Expands and installs into `~/Library/Screen Savers`.
+| Command | What it does |
+|---|---|
+| `make saver` | Build `dist/A2DClock.saver` only |
+| `make app` | Build `dist/A2DClock.app` (with screensaver embedded) |
+| `make install` | Build and install screensaver locally for testing |
+| `make release` | Package `dist/A2DClock.zip` for distribution |
+| `make clean` | Remove all build artifacts |
 
 ## Tests
 
