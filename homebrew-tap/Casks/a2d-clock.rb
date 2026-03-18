@@ -1,6 +1,6 @@
 cask "a2d-clock" do
   version "1.0.0"
-  sha256 "placeholder"
+  sha256 "126e8b126eacc3b13b1f0df25531531341047a8ff8220584b873beb9e1787567"
 
   url "https://github.com/lordSauron1710/a2d-clock/releases/download/v#{version}/A2DClock.zip"
   name "A2D Clock"
